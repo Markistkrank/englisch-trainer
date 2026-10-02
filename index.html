@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Englisch Trainer" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>Mein Englisch-Trainer</title>
+  <style>
+    :root {
+      --bg:#0b1020;
+      --card:#111827;
+      --card2:#172033;
+      --text:#f8fafc;
+      --muted:#a8b1c2;
+      --border:#2b3852;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --accent:#60a5fa;
+      --accent2:#93c5fd;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      min-height:100%;
+    }
+    body { padding: max(14px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom)); }
+    .app { max-width:760px; margin:0 auto; }
+    h1 { font-size:1.7rem; margin:.25rem 0 .25rem; }
+    .subtitle { color:var(--muted); margin:0 0 14px; }
+    .tabs {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin:12px 0;
+      position:sticky;
+      top:0;
+      padding:8px 0;
+      background:linear-gradient(var(--bg) 70%, transparent);
+      z-index:5;
+    }
+    button, input, textarea, select {
+      font:inherit;
+    }
+    button {
+      border:0;
+      border-radius:14px;
+      padding:13px 14px;
+      font-weight:700;
+      cursor:pointer;
+      color:var(--text);
+      background:#26334c;
+      min-height:48px;
+    }
+    button:active { transform:scale(.99); }
+    button.primary { background:#2563eb; }
+    button.good { background:#15803d; }
+    button.warn { background:#a16207; }
+    button.bad { background:#b91c1c; }
+    button.secondary { background:#334155; }
+    button.ghost { background:transparent; border:1px solid var(--border); }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .tabbtn.active { background:#2563eb; }
+    .panel { display:none; }
+    .panel.active { display:block; }
+    .card {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      margin:12px 0;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+    }
+    .question {
+      font-size:1.5rem;
+      font-weight:800;
+      text-align:center;
+      padding:14px 8px 8px;
+      line-height:1.35;
+      min-height:82px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .hint { color:var(--muted); text-align:center; line-height:1.4; }
+    .result {
+      margin:12px 0 0;
+      padding:14px;
+      border-radius:14px;
+      font-size:1.1rem;
+      font-weight:800;
+      text-align:center;
+      display:none;
+    }
+    .result.good { display:block; background:rgba(34,197,94,.13); border:1px solid rgba(34,197,94,.45); }
+    .result.warn { display:block; background:rgba(245,158,11,.13); border:1px solid rgba(245,158,11,.45); }
+    .result.bad { display:block; background:rgba(239,68,68,.13); border:1px solid rgba(239,68,68,.45); }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    @media(max-width:560px) {
+      .grid2,.grid3 { grid-template-columns:1fr; }
+      .tabs { grid-template-columns:repeat(3,1fr); }
+      .tabbtn { padding:10px 6px; font-size:.92rem; }
+    }
+    label { display:block; color:var(--muted); margin:10px 0 6px; font-weight:700; }
+    input, textarea, select {
+      width:100%;
+      border:1px solid var(--border);
+      background:#0f172a;
+      color:var(--text);
+      border-radius:14px;
+      padding:14px;
+      outline:none;
+    }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    textarea { min-height:84px; resize:vertical; }
+    .answerInput { font-size:1.2rem; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; }
+    .row > * { flex:1; }
+    .statgrid {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+    .stat {
+      background:var(--card2);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      text-align:center;
+    }
+    .stat b { display:block; font-size:1.8rem; margin-top:6px; }
+    .list { margin-top:12px; }
+    .item {
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:var(--card2);
+      padding:12px;
+      margin:8px 0;
+    }
+    .item .de { font-weight:800; margin-bottom:4px; }
+    .item .en { color:var(--accent2); }
+    .item .meta { color:var(--muted); font-size:.9rem; margin-top:6px; }
+    .item .actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .item .actions button { min-height:40px; padding:9px 10px; font-size:.95rem; flex:1; }
+    .privacy {
+      background:#0f172a;
+      border:1px solid #1d4ed8;
+      border-radius:16px;
+      padding:12px;
+      color:#dbeafe;
+      line-height:1.4;
+    }
+    .small { font-size:.9rem; color:var(--muted); }
+    .divider { height:1px; background:var(--border); margin:14px 0; }
+    .chip {
+      display:inline-block;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#1e293b;
+      color:#cbd5e1;
+      font-size:.85rem;
+      margin:3px 3px 3px 0;
+    }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>🇬🇧 Mein Englisch-Trainer</h1>
+  <p class="subtitle">Privat · lokal gespeichert · für dein iPhone</p>
+
+  <div class="privacy">
+    🔒 Deine Vokabeln, Sätze und dein Lernstand werden nur in diesem Browser auf deinem Gerät gespeichert.
+    Es gibt keine Benutzerkonten und keine Lern-Datenbank im Internet.
+  </div>
+
+  <div class="tabs">
+    <button class="tabbtn active" data-tab="lernen">🎤 Lernen</button>
+    <button class="tabbtn" data-tab="eintragen">➕ Eintragen</button>
+    <button class="tabbtn" data-tab="fortschritt">📊 Fortschritt</button>
+  </div>
+
+  <section id="lernen" class="panel active">
+    <div class="card">
+      <label for="mode">Lernmodus</label>
+      <select id="mode">
+        <option value="due">Fällige Wiederholungen</option>
+        <option value="mistakes">Fehler wiederholen</option>
+        <option value="all">Alle</option>
+        <option value="repeat">Nachsprechen</option>
+      </select>
+
+      <div id="modeHint" class="hint" style="margin-top:12px;">Sprich oder diktiere die englische Antwort.</div>
+      <div id="question" class="question">Noch keine Aufgabe</div>
+
+      <div class="grid2">
+        <button id="speakCorrect" class="secondary">🔊 Antwort anhören</button>
+        <button id="newQuestion" class="primary">➡ Nächste Frage</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <label for="answer">Deine englische Antwort</label>
+      <input id="answer" class="answerInput" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="Hier tippen oder iPhone-Diktat benutzen" />
+
+      <p class="small">
+        Für Sprache: Tippe ins Antwortfeld und benutze das 🎤 der iPhone-Tastatur.
+        Danach auf „Antwort prüfen“.
+      </p>
+
+      <div class="grid2">
+        <button id="checkAnswer" class="good">✅ Antwort prüfen</button>
+        <button id="showAnswer" class="ghost">👁 Lösung zeigen</button>
+      </div>
+
+      <div id="result" class="result"></div>
+
+      <button id="manualCorrect" class="warn hidden" style="width:100%; margin-top:10px;">
+        ✅ Ich hatte es richtig – Diktat war falsch
+      </button>
+    </div>
+  </section>
+
+  <section id="eintragen" class="panel">
+    <div class="card">
+      <h2 style="margin-top:0;">Wort oder Satz hinzufügen</h2>
+
+      <label for="deutsch">Deutsch</label>
+      <textarea id="deutsch" placeholder="z. B. Ich gehe heute zum Strand."></textarea>
+
+      <label for="englisch">Englisch</label>
+      <textarea id="englisch" placeholder="z. B. I am going to the beach today."></textarea>
+
+      <p class="small">
+        Mehrere richtige Antworten kannst du mit <b>|</b> trennen.<br>
+        Beispiel: <i>I am going home | I'm going home</i>
+      </p>
+
+      <button id="saveEntry" class="primary" style="width:100%;">💾 Speichern</button>
+      <div id="saveStatus" class="hint" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Meine Wörter & Sätze</h2>
+      <input id="search" placeholder="Suchen …" />
+      <div id="entryList" class="list"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Sicherung</h2>
+      <p class="small">
+        Weil alles nur auf deinem iPhone gespeichert wird, solltest du ab und zu eine Sicherung exportieren.
+      </p>
+      <div class="grid2">
+        <button id="exportBtn" class="secondary">⬇️ Sicherung exportieren</button>
+        <button id="importBtn" class="secondary">⬆️ Sicherung importieren</button>
+      </div>
+      <input id="importFile" type="file" accept="application/json" class="hidden" />
+    </div>
+  </section>
+
+  <section id="fortschritt" class="panel">
+    <div class="card">
+      <h2 style="margin-top:0;">Dein Lernfortschritt</h2>
+      <div class="statgrid">
+        <div class="stat">Wörter & Sätze<b id="statTotal">0</b></div>
+        <div class="stat">Richtig<b id="statRight">0</b></div>
+        <div class="stat">Falsch<b id="statWrong">0</b></div>
+        <div class="stat">Schwierig<b id="statHard">0</b></div>
+        <div class="stat">Heute fällig<b id="statDue">0</b></div>
+        <div class="stat">Gut gelernt<b id="statLearned">0</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Wie die Wiederholung funktioniert</h2>
+      <p class="small" style="line-height:1.55;">
+        Neue und falsch beantwortete Einträge kommen häufiger.
+        Nach richtigen Antworten wird der Abstand automatisch größer:
+        1 Tag → 2 Tage → 4 Tage → 7 Tage → 14 Tage → 30 Tage.
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+const DB_NAME = "englishTrainerPrivate";
+const DB_VERSION = 1;
+const STORE = "entries";
+
+let db = null;
+let current = null;
+let lastId = null;
+let lastMarkedWrong = false;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+
+    req.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        const store = d.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
+        store.createIndex("deutsch", "deutsch", { unique:false });
+        store.createIndex("englisch", "englisch", { unique:false });
+      }
+    };
+
+    req.onsuccess = (e) => {
+      db = e.target.result;
+      resolve(db);
+    };
+
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function getAllEntries() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readonly");
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function addEntry(entry) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const req = tx.objectStore(STORE).add(entry);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function putEntry(entry) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const req = tx.objectStore(STORE).put(entry);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function deleteEntry(id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const req = tx.objectStore(STORE).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function clearEntries() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const req = tx.objectStore(STORE).clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function todayISO() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function addDaysISO(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+
+function variants(text) {
+  return String(text || "")
+    .split("|")
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function normalize(text) {
+  let s = String(text || "").toLowerCase().trim();
+
+  const repl = {
+    "i'm":"i am", "you're":"you are", "he's":"he is", "she's":"she is",
+    "it's":"it is", "we're":"we are", "they're":"they are",
+    "can't":"cannot", "don't":"do not", "doesn't":"does not",
+    "didn't":"did not", "won't":"will not", "wouldn't":"would not",
+    "couldn't":"could not", "shouldn't":"should not",
+    "i've":"i have", "you've":"you have", "we've":"we have", "they've":"they have"
+  };
+  for (const [a,b] of Object.entries(repl)) s = s.split(a).join(b);
+
+  s = s.replace(/[^\p{L}\p{N}\s']/gu, "");
+  s = s.replace(/\s+/g, " ");
+  return s.trim();
+}
+
+function similarity(a, b) {
+  a = normalize(a);
+  b = normalize(b);
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+
+  // Levenshtein ratio
+  const m = a.length, n = b.length;
+  const dp = Array.from({length:m+1}, () => new Array(n+1).fill(0));
+  for (let i=0;i<=m;i++) dp[i][0]=i;
+  for (let j=0;j<=n;j++) dp[0][j]=j;
+  for (let i=1;i<=m;i++) {
+    for (let j=1;j<=n;j++) {
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i-1][j] + 1,
+        dp[i][j-1] + 1,
+        dp[i-1][j-1] + cost
+      );
+    }
+  }
+  return 1 - dp[m][n] / Math.max(m,n);
+}
+
+function bestSimilarity(answer, expected) {
+  let best = {score:0, text:expected};
+  for (const v of variants(expected)) {
+    const score = similarity(answer, v);
+    if (score > best.score) best = {score, text:v};
+  }
+  return best;
+}
+
+function weightedChoice(items) {
+  if (!items.length) return null;
+  const today = todayISO();
+  const weights = items.map(e => {
+    let w = 1;
+    w += (e.falsch || 0) * 3;
+    if ((e.richtig || 0) + (e.falsch || 0) === 0) w += 4;
+    if ((e.richtig || 0) < 3) w += 3 - (e.richtig || 0);
+    if (!e.naechsteWiederholung || e.naechsteWiederholung <= today) w += 3;
+    if ((e.serie || 0) >= 5) w = Math.max(1, w - 3);
+    return w;
+  });
+
+  const total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for (let i=0;i<items.length;i++) {
+    r -= weights[i];
+    if (r <= 0) return items[i];
+  }
+  return items[items.length-1];
+}
+
+async function chooseQuestion() {
+  const all = await getAllEntries();
+  if (!all.length) {
+    current = null;
+    document.getElementById("question").textContent = "Bitte zuerst Wörter oder Sätze eintragen.";
+    clearResult();
+    return;
+  }
+
+  const mode = document.getElementById("mode").value;
+  const today = todayISO();
+
+  let candidates = [...all];
+  if (mode === "mistakes") {
+    const filtered = all.filter(e => (e.falsch || 0) > 0 && (e.falsch || 0) >= (e.richtig || 0));
+    if (filtered.length) candidates = filtered;
+  } else if (mode === "due") {
+    const filtered = all.filter(e => !e.naechsteWiederholung || e.naechsteWiederholung <= today);
+    if (filtered.length) candidates = filtered;
+  }
+
+  const noRepeat = candidates.filter(e => candidates.length === 1 || e.id !== lastId);
+  current = weightedChoice(noRepeat.length ? noRepeat : candidates);
+  lastId = current.id;
+  lastMarkedWrong = false;
+
+  const q = document.getElementById("question");
+  const hint = document.getElementById("modeHint");
+
+  if (mode === "repeat") {
+    q.textContent = variants(current.englisch)[0];
+    hint.textContent = "Höre den englischen Satz an und sprich ihn nach.";
+  } else {
+    q.textContent = current.deutsch;
+    hint.textContent = "Sprich oder diktiere die englische Antwort.";
+  }
+
+  document.getElementById("answer").value = "";
+  document.getElementById("manualCorrect").classList.add("hidden");
+  clearResult();
+}
+
+function clearResult() {
+  const r = document.getElementById("result");
+  r.textContent = "";
+  r.className = "result";
+}
+
+async function markCorrect(entry, undoWrong=false) {
+  entry.richtig = (entry.richtig || 0) + 1;
+  if (undoWrong && (entry.falsch || 0) > 0) entry.falsch--;
+  entry.serie = (entry.serie || 0) + 1;
+  entry.letzteWiederholung = todayISO();
+
+  let days = 1;
+  if (entry.serie === 2) days = 2;
+  else if (entry.serie === 3) days = 4;
+  else if (entry.serie === 4) days = 7;
+  else if (entry.serie === 5) days = 14;
+  else if (entry.serie >= 6) days = 30;
+
+  entry.naechsteWiederholung = addDaysISO(days);
+  await putEntry(entry);
+}
+
+async function markWrong(entry) {
+  entry.falsch = (entry.falsch || 0) + 1;
+  entry.serie = 0;
+  entry.letzteWiederholung = todayISO();
+  entry.naechsteWiederholung = todayISO();
+  await putEntry(entry);
+}
+
+async function checkCurrentAnswer() {
+  if (!current) {
+    await chooseQuestion();
+    return;
+  }
+
+  const answer = document.getElementById("answer").value.trim();
+  if (!answer) {
+    showResult("Bitte zuerst deine Antwort eingeben oder diktieren.", "warn");
+    return;
+  }
+
+  const best = bestSimilarity(answer, current.englisch);
+
+  if (best.score >= 0.90) {
+    await markCorrect(current);
+    lastMarkedWrong = false;
+    showResult("✅ RICHTIG", "good");
+    document.getElementById("manualCorrect").classList.add("hidden");
+  } else if (best.score >= 0.72) {
+    await markWrong(current);
+    lastMarkedWrong = true;
+    showResult(`🟡 FAST RICHTIG\nRichtig: ${best.text}`, "warn");
+    document.getElementById("manualCorrect").classList.remove("hidden");
+  } else {
+    await markWrong(current);
+    lastMarkedWrong = true;
+    showResult(`❌ NOCH NICHT RICHTIG\nRichtig: ${best.text}`, "bad");
+    document.getElementById("manualCorrect").classList.remove("hidden");
+  }
+
+  await renderList();
+  await renderStats();
+}
+
+function showResult(text, kind) {
+  const r = document.getElementById("result");
+  r.textContent = text;
+  r.className = `result ${kind}`;
+  r.style.whiteSpace = "pre-line";
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) {
+    alert("Vorlesen wird auf diesem Gerät nicht unterstützt.");
+    return;
+  }
+
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB";
+  u.rate = 0.88;
+  const voices = speechSynthesis.getVoices();
+  const en = voices.find(v => /^en(-|_)/i.test(v.lang));
+  if (en) u.voice = en;
+  speechSynthesis.speak(u);
+}
+
+async function renderList() {
+  const all = await getAllEntries();
+  const search = document.getElementById("search").value.trim().toLowerCase();
+  const list = document.getElementById("entryList");
+  list.innerHTML = "";
+
+  const filtered = all
+    .filter(e => !search ||
+      String(e.deutsch).toLowerCase().includes(search) ||
+      String(e.englisch).toLowerCase().includes(search))
+    .sort((a,b) => b.id - a.id);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="hint">Noch keine passenden Einträge.</div>`;
+    return;
+  }
+
+  for (const e of filtered) {
+    const total = (e.richtig||0)+(e.falsch||0);
+    const quote = total ? Math.round((e.richtig||0)/total*100) + "%" : "neu";
+
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="de"></div>
+      <div class="en"></div>
+      <div class="meta"></div>
+      <div class="actions">
+        <button class="secondary speak">🔊 Anhören</button>
+        <button class="ghost reset">↩ Reset</button>
+        <button class="bad delete">🗑 Löschen</button>
+      </div>
+    `;
+    div.querySelector(".de").textContent = e.deutsch;
+    div.querySelector(".en").textContent = variants(e.englisch)[0];
+    div.querySelector(".meta").textContent =
+      `Richtig: ${e.richtig||0} · Falsch: ${e.falsch||0} · Treffer: ${quote}`;
+    div.querySelector(".speak").onclick = () => speak(variants(e.englisch)[0]);
+    div.querySelector(".reset").onclick = async () => {
+      e.richtig=0; e.falsch=0; e.serie=0;
+      e.letzteWiederholung=null; e.naechsteWiederholung=null;
+      await putEntry(e); await renderList(); await renderStats();
+    };
+    div.querySelector(".delete").onclick = async () => {
+      if (confirm("Diesen Eintrag wirklich löschen?")) {
+        await deleteEntry(e.id);
+        if (current && current.id === e.id) current = null;
+        await renderList(); await renderStats();
+      }
+    };
+    list.appendChild(div);
+  }
+}
+
+async function renderStats() {
+  const all = await getAllEntries();
+  const today = todayISO();
+
+  const total = all.length;
+  const right = all.reduce((s,e)=>s+(e.richtig||0),0);
+  const wrong = all.reduce((s,e)=>s+(e.falsch||0),0);
+  const hard = all.filter(e => (e.falsch||0)>0 && (e.falsch||0)>=(e.richtig||0)).length;
+  const due = all.filter(e => !e.naechsteWiederholung || e.naechsteWiederholung <= today).length;
+  const learned = all.filter(e => (e.serie||0) >= 5).length;
+
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statRight").textContent = right;
+  document.getElementById("statWrong").textContent = wrong;
+  document.getElementById("statHard").textContent = hard;
+  document.getElementById("statDue").textContent = due;
+  document.getElementById("statLearned").textContent = learned;
+}
+
+function switchTab(id) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === id));
+  document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+  if (id === "eintragen") renderList();
+  if (id === "fortschritt") renderStats();
+}
+
+async function exportBackup() {
+  const entries = await getAllEntries();
+  const data = {
+    app: "Mein Englisch-Trainer",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    entries
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `englisch-trainer-backup-${todayISO()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function importBackup(file) {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data || !Array.isArray(data.entries)) throw new Error("Ungültige Sicherungsdatei.");
+
+    if (!confirm(`Sicherung mit ${data.entries.length} Einträgen importieren? Bestehende Daten werden ersetzt.`)) return;
+
+    await clearEntries();
+
+    for (const old of data.entries) {
+      const copy = {...old};
+      delete copy.id;
+      await addEntry(copy);
+    }
+
+    alert("Sicherung wurde importiert.");
+    current = null;
+    await renderList();
+    await renderStats();
+    await chooseQuestion();
+  } catch (err) {
+    alert("Import fehlgeschlagen: " + err.message);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await openDB();
+
+  document.querySelectorAll(".tabbtn").forEach(btn => {
+    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+  });
+
+  document.getElementById("saveEntry").onclick = async () => {
+    const de = document.getElementById("deutsch").value.trim();
+    const en = document.getElementById("englisch").value.trim();
+    const status = document.getElementById("saveStatus");
+
+    if (!de || !en) {
+      status.textContent = "Bitte Deutsch und Englisch eingeben.";
+      return;
+    }
+
+    await addEntry({
+      deutsch: de,
+      englisch: en,
+      richtig: 0,
+      falsch: 0,
+      serie: 0,
+      letzteWiederholung: null,
+      naechsteWiederholung: null,
+      createdAt: new Date().toISOString()
+    });
+
+    document.getElementById("deutsch").value = "";
+    document.getElementById("englisch").value = "";
+    status.textContent = "✅ Gespeichert";
+    setTimeout(()=>status.textContent="", 1600);
+
+    await renderList();
+    await renderStats();
+    if (!current) await chooseQuestion();
+  };
+
+  document.getElementById("newQuestion").onclick = chooseQuestion;
+  document.getElementById("checkAnswer").onclick = checkCurrentAnswer;
+
+  document.getElementById("showAnswer").onclick = () => {
+    if (!current) return;
+    showResult(`Lösung:\n${variants(current.englisch)[0]}`, "warn");
+  };
+
+  document.getElementById("speakCorrect").onclick = () => {
+    if (!current) return;
+    speak(variants(current.englisch)[0]);
+  };
+
+  document.getElementById("manualCorrect").onclick = async () => {
+    if (!current) return;
+    await markCorrect(current, lastMarkedWrong);
+    lastMarkedWrong = false;
+    showResult("✅ ALS RICHTIG MARKIERT", "good");
+    document.getElementById("manualCorrect").classList.add("hidden");
+    await renderList();
+    await renderStats();
+  };
+
+  document.getElementById("mode").onchange = chooseQuestion;
+  document.getElementById("search").oninput = renderList;
+  document.getElementById("exportBtn").onclick = exportBackup;
+
+  document.getElementById("importBtn").onclick = () => {
+    document.getElementById("importFile").click();
+  };
+
+  document.getElementById("importFile").onchange = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      await importBackup(e.target.files[0]);
+      e.target.value = "";
+    }
+  };
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+
+  await renderList();
+  await renderStats();
+  await chooseQuestion();
+});
+</script>
+</body>
+</html>
