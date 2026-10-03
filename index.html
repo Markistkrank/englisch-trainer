@@ -1,806 +1,200 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Englisch Trainer" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>Mein Englisch-Trainer</title>
-  <style>
-    :root {
-      --bg:#0b1020;
-      --card:#111827;
-      --card2:#172033;
-      --text:#f8fafc;
-      --muted:#a8b1c2;
-      --border:#2b3852;
-      --good:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
-      --accent:#60a5fa;
-      --accent2:#93c5fd;
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin:0;
-      padding:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      min-height:100%;
-    }
-    body { padding: max(14px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom)); }
-    .app { max-width:760px; margin:0 auto; }
-    h1 { font-size:1.7rem; margin:.25rem 0 .25rem; }
-    .subtitle { color:var(--muted); margin:0 0 14px; }
-    .tabs {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:8px;
-      margin:12px 0;
-      position:sticky;
-      top:0;
-      padding:8px 0;
-      background:linear-gradient(var(--bg) 70%, transparent);
-      z-index:5;
-    }
-    button, input, textarea, select {
-      font:inherit;
-    }
-    button {
-      border:0;
-      border-radius:14px;
-      padding:13px 14px;
-      font-weight:700;
-      cursor:pointer;
-      color:var(--text);
-      background:#26334c;
-      min-height:48px;
-    }
-    button:active { transform:scale(.99); }
-    button.primary { background:#2563eb; }
-    button.good { background:#15803d; }
-    button.warn { background:#a16207; }
-    button.bad { background:#b91c1c; }
-    button.secondary { background:#334155; }
-    button.ghost { background:transparent; border:1px solid var(--border); }
-    button:disabled { opacity:.45; cursor:not-allowed; }
-    .tabbtn.active { background:#2563eb; }
-    .panel { display:none; }
-    .panel.active { display:block; }
-    .card {
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:16px;
-      margin:12px 0;
-      box-shadow:0 10px 24px rgba(0,0,0,.18);
-    }
-    .question {
-      font-size:1.5rem;
-      font-weight:800;
-      text-align:center;
-      padding:14px 8px 8px;
-      line-height:1.35;
-      min-height:82px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .hint { color:var(--muted); text-align:center; line-height:1.4; }
-    .result {
-      margin:12px 0 0;
-      padding:14px;
-      border-radius:14px;
-      font-size:1.1rem;
-      font-weight:800;
-      text-align:center;
-      display:none;
-    }
-    .result.good { display:block; background:rgba(34,197,94,.13); border:1px solid rgba(34,197,94,.45); }
-    .result.warn { display:block; background:rgba(245,158,11,.13); border:1px solid rgba(245,158,11,.45); }
-    .result.bad { display:block; background:rgba(239,68,68,.13); border:1px solid rgba(239,68,68,.45); }
-    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    @media(max-width:560px) {
-      .grid2,.grid3 { grid-template-columns:1fr; }
-      .tabs { grid-template-columns:repeat(3,1fr); }
-      .tabbtn { padding:10px 6px; font-size:.92rem; }
-    }
-    label { display:block; color:var(--muted); margin:10px 0 6px; font-weight:700; }
-    input, textarea, select {
-      width:100%;
-      border:1px solid var(--border);
-      background:#0f172a;
-      color:var(--text);
-      border-radius:14px;
-      padding:14px;
-      outline:none;
-    }
-    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
-    textarea { min-height:84px; resize:vertical; }
-    .answerInput { font-size:1.2rem; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; }
-    .row > * { flex:1; }
-    .statgrid {
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-    }
-    .stat {
-      background:var(--card2);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:16px;
-      text-align:center;
-    }
-    .stat b { display:block; font-size:1.8rem; margin-top:6px; }
-    .list { margin-top:12px; }
-    .item {
-      border:1px solid var(--border);
-      border-radius:16px;
-      background:var(--card2);
-      padding:12px;
-      margin:8px 0;
-    }
-    .item .de { font-weight:800; margin-bottom:4px; }
-    .item .en { color:var(--accent2); }
-    .item .meta { color:var(--muted); font-size:.9rem; margin-top:6px; }
-    .item .actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-    .item .actions button { min-height:40px; padding:9px 10px; font-size:.95rem; flex:1; }
-    .privacy {
-      background:#0f172a;
-      border:1px solid #1d4ed8;
-      border-radius:16px;
-      padding:12px;
-      color:#dbeafe;
-      line-height:1.4;
-    }
-    .small { font-size:.9rem; color:var(--muted); }
-    .divider { height:1px; background:var(--border); margin:14px 0; }
-    .chip {
-      display:inline-block;
-      padding:5px 9px;
-      border-radius:999px;
-      background:#1e293b;
-      color:#cbd5e1;
-      font-size:.85rem;
-      margin:3px 3px 3px 0;
-    }
-    .hidden { display:none !important; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Englisch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Mein Englisch-Trainer</title>
+<style>
+:root{--bg:#08101f;--card:#111827;--card2:#172033;--text:#f8fafc;--muted:#a8b1c2;--line:#2b3852;--blue:#2563eb;--green:#15803d;--orange:#a16207;--red:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:14px;min-height:100vh}.app{max-width:760px;margin:auto}
+h1{font-size:1.6rem;margin:4px 0}.sub{color:var(--muted);margin:0 0 10px}.privacy{background:#0f172a;border:1px solid #1d4ed8;border-radius:14px;padding:10px;color:#dbeafe;font-size:.9rem}
+nav{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:10px 0;position:sticky;top:0;background:linear-gradient(var(--bg) 80%,transparent);padding:7px 0;z-index:5}
+button,input,textarea{font:inherit}button{border:0;border-radius:13px;padding:11px 8px;font-weight:700;background:#26334c;color:white;min-height:44px}button.primary{background:var(--blue)}button.good{background:var(--green)}button.warn{background:var(--orange)}button.bad{background:var(--red)}button.ghost{background:transparent;border:1px solid var(--line)}
+.nav{font-size:.82rem;padding:8px 3px}.nav.active{background:var(--blue)}.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0}
+.q{font-size:1.45rem;font-weight:800;text-align:center;min-height:84px;display:flex;align-items:center;justify-content:center;line-height:1.35}.hint{text-align:center;color:var(--muted)}.counter{text-align:center;color:#bfdbfe;font-weight:700;margin:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:560px){.grid2{grid-template-columns:1fr}.nav span{display:block;font-size:1.1rem}}
+label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,textarea{width:100%;background:#0f172a;color:white;border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}textarea{min-height:74px}.ans{font-size:1.15rem}
+.result{display:none;margin-top:10px;padding:12px;border-radius:13px;text-align:center;font-weight:800;white-space:pre-line}.result.good{display:block;background:rgba(21,128,61,.2)}.result.warn{display:block;background:rgba(161,98,7,.2)}.result.bad{display:block;background:rgba(185,28,28,.2)}
+.hidden{display:none!important}.small{font-size:.88rem;color:var(--muted);line-height:1.4}.item{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:11px;margin:8px 0}.item .de{font-weight:800}.item .en{color:#bfdbfe;margin-top:3px}.item .sentence{font-size:.9rem;color:#cbd5e1;margin-top:6px}.meta{font-size:.82rem;color:var(--muted);margin-top:6px}.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.actions button{flex:1;min-height:38px;padding:7px}
+.suggest{display:none;background:#10213b;border:1px solid #2563eb;border-radius:12px;padding:10px;margin-top:8px}.suggest.show{display:block}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}.stat b{display:block;font-size:1.7rem;margin-top:4px}
+.badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:.75rem;margin-top:6px}.hard{background:#7f1d1d;color:#fecaca}.due{background:#713f12;color:#fde68a}.learned{background:#14532d;color:#bbf7d0}
+</style>
 </head>
-<body>
-<div class="app">
-  <h1>🇬🇧 Mein Englisch-Trainer</h1>
-  <p class="subtitle">Privat · lokal gespeichert · für dein iPhone</p>
+<body><div class="app">
+<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Privat · kostenlos · lokal auf deinem iPhone</p>
+<div class="privacy">🔒 Deine Wörter, Sätze und dein Lernstand bleiben auf deinem Gerät.</div>
 
-  <div class="privacy">
-    🔒 Deine Vokabeln, Sätze und dein Lernstand werden nur in diesem Browser auf deinem Gerät gespeichert.
-    Es gibt keine Benutzerkonten und keine Lern-Datenbank im Internet.
-  </div>
+<nav>
+<button class="nav active" data-tab="today"><span>🎯</span>Heute</button>
+<button class="nav" data-tab="mistakes"><span>🔁</span>Fehler</button>
+<button class="nav" data-tab="sentences"><span>🗣</span>Sätze</button>
+<button class="nav" data-tab="add"><span>➕</span>Neu</button>
+<button class="nav" data-tab="progress"><span>📊</span>Stand</button>
+</nav>
 
-  <div class="tabs">
-    <button class="tabbtn active" data-tab="lernen">🎤 Lernen</button>
-    <button class="tabbtn" data-tab="eintragen">➕ Eintragen</button>
-    <button class="tabbtn" data-tab="fortschritt">📊 Fortschritt</button>
-  </div>
+<section id="today" class="panel active">
+<div class="card"><h2>🎯 Heute lernen</h2><div id="todayCount" class="counter"></div><div id="todayQ" class="q"></div>
+<div class="grid2"><button id="todayListen">🔊 Anhören</button><button id="todayNext" class="primary">➡ Nächste</button></div>
+<label>Deine englische Antwort</label><input id="todayA" class="ans" placeholder="Tippen oder iPhone-Diktat 🎤">
+<p class="small">Tippe ins Feld und nutze das Mikrofon der iPhone-Tastatur.</p>
+<button id="todayCheck" class="good" style="width:100%">✅ Prüfen</button><div id="todayR" class="result"></div>
+<button id="todayManual" class="warn hidden" style="width:100%;margin-top:8px">✅ Ich hatte es richtig</button>
+</div></section>
 
-  <section id="lernen" class="panel active">
-    <div class="card">
-      <label for="mode">Lernmodus</label>
-      <select id="mode">
-        <option value="due">Fällige Wiederholungen</option>
-        <option value="mistakes">Fehler wiederholen</option>
-        <option value="all">Alle</option>
-        <option value="repeat">Nachsprechen</option>
-      </select>
+<section id="mistakes" class="panel">
+<div class="card"><h2>🔁 Fehler wiederholen</h2><div id="mistCount" class="counter"></div><div id="mistQ" class="q"></div>
+<div class="grid2"><button id="mistListen">🔊 Anhören</button><button id="mistNext" class="primary">➡ Nächste</button></div>
+<label>Deine Antwort</label><input id="mistA" class="ans"><button id="mistCheck" class="good" style="width:100%;margin-top:8px">✅ Prüfen</button>
+<div id="mistR" class="result"></div><button id="mistManual" class="warn hidden" style="width:100%;margin-top:8px">✅ Ich hatte es richtig</button>
+</div></section>
 
-      <div id="modeHint" class="hint" style="margin-top:12px;">Sprich oder diktiere die englische Antwort.</div>
-      <div id="question" class="question">Noch keine Aufgabe</div>
+<section id="sentences" class="panel">
+<div class="card"><h2>🗣 Sätze sprechen</h2><div id="sentCount" class="counter"></div><div id="sentQ" class="q"></div>
+<div class="grid2"><button id="sentListen">🔊 Satz anhören</button><button id="sentNext" class="primary">➡ Nächster Satz</button></div>
+<label>Englischen Satz sagen oder tippen</label><input id="sentA" class="ans">
+<button id="sentCheck" class="good" style="width:100%;margin-top:8px">✅ Satz prüfen</button><div id="sentR" class="result"></div>
+<button id="sentManual" class="warn hidden" style="width:100%;margin-top:8px">✅ Ich hatte den Satz richtig</button>
+</div></section>
 
-      <div class="grid2">
-        <button id="speakCorrect" class="secondary">🔊 Antwort anhören</button>
-        <button id="newQuestion" class="primary">➡ Nächste Frage</button>
-      </div>
+<section id="add" class="panel">
+<div class="card"><h2>➕ Wort oder Satz hinzufügen</h2>
+<label>Deutsch</label><input id="german" placeholder="z. B. Strand">
+<div id="suggest" class="suggest"><b>💡 Lokaler Vorschlag</b><div id="suggestText" class="small"></div></div>
+<label>Englisch</label><input id="english" placeholder="z. B. beach" autocapitalize="off">
+<label>Beispielsatz Deutsch (optional)</label><textarea id="sentenceDe"></textarea>
+<label>Beispielsatz Englisch (optional)</label><textarea id="sentenceEn" autocapitalize="off"></textarea>
+<div class="grid2"><button id="listenWord">🔊 Wort anhören</button><button id="listenSentence">🔊 Satz anhören</button></div>
+<button id="save" class="primary" style="width:100%;margin-top:8px">💾 Speichern</button><div id="saveStatus" class="hint"></div>
+</div>
+<div class="card"><h2>Meine Wörter & Sätze</h2><input id="search" placeholder="Suchen …"><div id="list"></div></div>
+<div class="card"><h2>💾 Sicherung</h2><p class="small">Ab und zu exportieren und z. B. in iCloud Drive sichern.</p>
+<div class="grid2"><button id="export">⬇️ Exportieren</button><button id="import">⬆️ Importieren</button></div><input id="importFile" type="file" accept="application/json" class="hidden">
+</div></section>
 
-      <div class="divider"></div>
-
-      <label for="answer">Deine englische Antwort</label>
-      <input id="answer" class="answerInput" autocomplete="off" autocapitalize="off" spellcheck="false"
-             placeholder="Hier tippen oder iPhone-Diktat benutzen" />
-
-      <p class="small">
-        Für Sprache: Tippe ins Antwortfeld und benutze das 🎤 der iPhone-Tastatur.
-        Danach auf „Antwort prüfen“.
-      </p>
-
-      <div class="grid2">
-        <button id="checkAnswer" class="good">✅ Antwort prüfen</button>
-        <button id="showAnswer" class="ghost">👁 Lösung zeigen</button>
-      </div>
-
-      <div id="result" class="result"></div>
-
-      <button id="manualCorrect" class="warn hidden" style="width:100%; margin-top:10px;">
-        ✅ Ich hatte es richtig – Diktat war falsch
-      </button>
-    </div>
-  </section>
-
-  <section id="eintragen" class="panel">
-    <div class="card">
-      <h2 style="margin-top:0;">Wort oder Satz hinzufügen</h2>
-
-      <label for="deutsch">Deutsch</label>
-      <textarea id="deutsch" placeholder="z. B. Ich gehe heute zum Strand."></textarea>
-
-      <label for="englisch">Englisch</label>
-      <textarea id="englisch" placeholder="z. B. I am going to the beach today."></textarea>
-
-      <p class="small">
-        Mehrere richtige Antworten kannst du mit <b>|</b> trennen.<br>
-        Beispiel: <i>I am going home | I'm going home</i>
-      </p>
-
-      <button id="saveEntry" class="primary" style="width:100%;">💾 Speichern</button>
-      <div id="saveStatus" class="hint" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin-top:0;">Meine Wörter & Sätze</h2>
-      <input id="search" placeholder="Suchen …" />
-      <div id="entryList" class="list"></div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin-top:0;">Sicherung</h2>
-      <p class="small">
-        Weil alles nur auf deinem iPhone gespeichert wird, solltest du ab und zu eine Sicherung exportieren.
-      </p>
-      <div class="grid2">
-        <button id="exportBtn" class="secondary">⬇️ Sicherung exportieren</button>
-        <button id="importBtn" class="secondary">⬆️ Sicherung importieren</button>
-      </div>
-      <input id="importFile" type="file" accept="application/json" class="hidden" />
-    </div>
-  </section>
-
-  <section id="fortschritt" class="panel">
-    <div class="card">
-      <h2 style="margin-top:0;">Dein Lernfortschritt</h2>
-      <div class="statgrid">
-        <div class="stat">Wörter & Sätze<b id="statTotal">0</b></div>
-        <div class="stat">Richtig<b id="statRight">0</b></div>
-        <div class="stat">Falsch<b id="statWrong">0</b></div>
-        <div class="stat">Schwierig<b id="statHard">0</b></div>
-        <div class="stat">Heute fällig<b id="statDue">0</b></div>
-        <div class="stat">Gut gelernt<b id="statLearned">0</b></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin-top:0;">Wie die Wiederholung funktioniert</h2>
-      <p class="small" style="line-height:1.55;">
-        Neue und falsch beantwortete Einträge kommen häufiger.
-        Nach richtigen Antworten wird der Abstand automatisch größer:
-        1 Tag → 2 Tage → 4 Tage → 7 Tage → 14 Tage → 30 Tage.
-      </p>
-    </div>
-  </section>
+<section id="progress" class="panel">
+<div class="card"><h2>📊 Dein Fortschritt</h2><div class="stats">
+<div class="stat">Wörter & Sätze<b id="sTotal">0</b></div><div class="stat">Heute fällig<b id="sDue">0</b></div>
+<div class="stat">Schwierig<b id="sHard">0</b></div><div class="stat">Gut gelernt<b id="sLearned">0</b></div>
+<div class="stat">Richtig<b id="sRight">0</b></div><div class="stat">Falsch<b id="sWrong">0</b></div>
+</div></div></section>
 </div>
 
 <script>
-const DB_NAME = "englishTrainerPrivate";
-const DB_VERSION = 1;
-const STORE = "entries";
-
-let db = null;
-let current = null;
-let lastId = null;
-let lastMarkedWrong = false;
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-
-    req.onupgradeneeded = (e) => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains(STORE)) {
-        const store = d.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
-        store.createIndex("deutsch", "deutsch", { unique:false });
-        store.createIndex("englisch", "englisch", { unique:false });
-      }
-    };
-
-    req.onsuccess = (e) => {
-      db = e.target.result;
-      resolve(db);
-    };
-
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function getAllEntries() {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readonly");
-    const req = tx.objectStore(STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function addEntry(entry) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    const req = tx.objectStore(STORE).add(entry);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function putEntry(entry) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    const req = tx.objectStore(STORE).put(entry);
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function deleteEntry(id) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    const req = tx.objectStore(STORE).delete(id);
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function clearEntries() {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    const req = tx.objectStore(STORE).clear();
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
-}
-
-function todayISO() {
-  return new Date().toISOString().slice(0,10);
-}
-
-function addDaysISO(days) {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0,10);
-}
-
-function variants(text) {
-  return String(text || "")
-    .split("|")
-    .map(x => x.trim())
-    .filter(Boolean);
-}
-
-function normalize(text) {
-  let s = String(text || "").toLowerCase().trim();
-
-  const repl = {
-    "i'm":"i am", "you're":"you are", "he's":"he is", "she's":"she is",
-    "it's":"it is", "we're":"we are", "they're":"they are",
-    "can't":"cannot", "don't":"do not", "doesn't":"does not",
-    "didn't":"did not", "won't":"will not", "wouldn't":"would not",
-    "couldn't":"could not", "shouldn't":"should not",
-    "i've":"i have", "you've":"you have", "we've":"we have", "they've":"they have"
-  };
-  for (const [a,b] of Object.entries(repl)) s = s.split(a).join(b);
-
-  s = s.replace(/[^\p{L}\p{N}\s']/gu, "");
-  s = s.replace(/\s+/g, " ");
-  return s.trim();
-}
-
-function similarity(a, b) {
-  a = normalize(a);
-  b = normalize(b);
-  if (!a || !b) return 0;
-  if (a === b) return 1;
-
-  // Levenshtein ratio
-  const m = a.length, n = b.length;
-  const dp = Array.from({length:m+1}, () => new Array(n+1).fill(0));
-  for (let i=0;i<=m;i++) dp[i][0]=i;
-  for (let j=0;j<=n;j++) dp[0][j]=j;
-  for (let i=1;i<=m;i++) {
-    for (let j=1;j<=n;j++) {
-      const cost = a[i-1] === b[j-1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i-1][j] + 1,
-        dp[i][j-1] + 1,
-        dp[i-1][j-1] + cost
-      );
-    }
-  }
-  return 1 - dp[m][n] / Math.max(m,n);
-}
-
-function bestSimilarity(answer, expected) {
-  let best = {score:0, text:expected};
-  for (const v of variants(expected)) {
-    const score = similarity(answer, v);
-    if (score > best.score) best = {score, text:v};
-  }
-  return best;
-}
-
-function weightedChoice(items) {
-  if (!items.length) return null;
-  const today = todayISO();
-  const weights = items.map(e => {
-    let w = 1;
-    w += (e.falsch || 0) * 3;
-    if ((e.richtig || 0) + (e.falsch || 0) === 0) w += 4;
-    if ((e.richtig || 0) < 3) w += 3 - (e.richtig || 0);
-    if (!e.naechsteWiederholung || e.naechsteWiederholung <= today) w += 3;
-    if ((e.serie || 0) >= 5) w = Math.max(1, w - 3);
-    return w;
-  });
-
-  const total = weights.reduce((a,b)=>a+b,0);
-  let r = Math.random()*total;
-  for (let i=0;i<items.length;i++) {
-    r -= weights[i];
-    if (r <= 0) return items[i];
-  }
-  return items[items.length-1];
-}
-
-async function chooseQuestion() {
-  const all = await getAllEntries();
-  if (!all.length) {
-    current = null;
-    document.getElementById("question").textContent = "Bitte zuerst Wörter oder Sätze eintragen.";
-    clearResult();
-    return;
-  }
-
-  const mode = document.getElementById("mode").value;
-  const today = todayISO();
-
-  let candidates = [...all];
-  if (mode === "mistakes") {
-    const filtered = all.filter(e => (e.falsch || 0) > 0 && (e.falsch || 0) >= (e.richtig || 0));
-    if (filtered.length) candidates = filtered;
-  } else if (mode === "due") {
-    const filtered = all.filter(e => !e.naechsteWiederholung || e.naechsteWiederholung <= today);
-    if (filtered.length) candidates = filtered;
-  }
-
-  const noRepeat = candidates.filter(e => candidates.length === 1 || e.id !== lastId);
-  current = weightedChoice(noRepeat.length ? noRepeat : candidates);
-  lastId = current.id;
-  lastMarkedWrong = false;
-
-  const q = document.getElementById("question");
-  const hint = document.getElementById("modeHint");
-
-  if (mode === "repeat") {
-    q.textContent = variants(current.englisch)[0];
-    hint.textContent = "Höre den englischen Satz an und sprich ihn nach.";
-  } else {
-    q.textContent = current.deutsch;
-    hint.textContent = "Sprich oder diktiere die englische Antwort.";
-  }
-
-  document.getElementById("answer").value = "";
-  document.getElementById("manualCorrect").classList.add("hidden");
-  clearResult();
-}
-
-function clearResult() {
-  const r = document.getElementById("result");
-  r.textContent = "";
-  r.className = "result";
-}
-
-async function markCorrect(entry, undoWrong=false) {
-  entry.richtig = (entry.richtig || 0) + 1;
-  if (undoWrong && (entry.falsch || 0) > 0) entry.falsch--;
-  entry.serie = (entry.serie || 0) + 1;
-  entry.letzteWiederholung = todayISO();
-
-  let days = 1;
-  if (entry.serie === 2) days = 2;
-  else if (entry.serie === 3) days = 4;
-  else if (entry.serie === 4) days = 7;
-  else if (entry.serie === 5) days = 14;
-  else if (entry.serie >= 6) days = 30;
-
-  entry.naechsteWiederholung = addDaysISO(days);
-  await putEntry(entry);
-}
-
-async function markWrong(entry) {
-  entry.falsch = (entry.falsch || 0) + 1;
-  entry.serie = 0;
-  entry.letzteWiederholung = todayISO();
-  entry.naechsteWiederholung = todayISO();
-  await putEntry(entry);
-}
-
-async function checkCurrentAnswer() {
-  if (!current) {
-    await chooseQuestion();
-    return;
-  }
-
-  const answer = document.getElementById("answer").value.trim();
-  if (!answer) {
-    showResult("Bitte zuerst deine Antwort eingeben oder diktieren.", "warn");
-    return;
-  }
-
-  const best = bestSimilarity(answer, current.englisch);
-
-  if (best.score >= 0.90) {
-    await markCorrect(current);
-    lastMarkedWrong = false;
-    showResult("✅ RICHTIG", "good");
-    document.getElementById("manualCorrect").classList.add("hidden");
-  } else if (best.score >= 0.72) {
-    await markWrong(current);
-    lastMarkedWrong = true;
-    showResult(`🟡 FAST RICHTIG\nRichtig: ${best.text}`, "warn");
-    document.getElementById("manualCorrect").classList.remove("hidden");
-  } else {
-    await markWrong(current);
-    lastMarkedWrong = true;
-    showResult(`❌ NOCH NICHT RICHTIG\nRichtig: ${best.text}`, "bad");
-    document.getElementById("manualCorrect").classList.remove("hidden");
-  }
-
-  await renderList();
-  await renderStats();
-}
-
-function showResult(text, kind) {
-  const r = document.getElementById("result");
-  r.textContent = text;
-  r.className = `result ${kind}`;
-  r.style.whiteSpace = "pre-line";
-}
-
-function speak(text) {
-  if (!("speechSynthesis" in window)) {
-    alert("Vorlesen wird auf diesem Gerät nicht unterstützt.");
-    return;
-  }
-
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-GB";
-  u.rate = 0.88;
-  const voices = speechSynthesis.getVoices();
-  const en = voices.find(v => /^en(-|_)/i.test(v.lang));
-  if (en) u.voice = en;
-  speechSynthesis.speak(u);
-}
-
-async function renderList() {
-  const all = await getAllEntries();
-  const search = document.getElementById("search").value.trim().toLowerCase();
-  const list = document.getElementById("entryList");
-  list.innerHTML = "";
-
-  const filtered = all
-    .filter(e => !search ||
-      String(e.deutsch).toLowerCase().includes(search) ||
-      String(e.englisch).toLowerCase().includes(search))
-    .sort((a,b) => b.id - a.id);
-
-  if (!filtered.length) {
-    list.innerHTML = `<div class="hint">Noch keine passenden Einträge.</div>`;
-    return;
-  }
-
-  for (const e of filtered) {
-    const total = (e.richtig||0)+(e.falsch||0);
-    const quote = total ? Math.round((e.richtig||0)/total*100) + "%" : "neu";
-
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `
-      <div class="de"></div>
-      <div class="en"></div>
-      <div class="meta"></div>
-      <div class="actions">
-        <button class="secondary speak">🔊 Anhören</button>
-        <button class="ghost reset">↩ Reset</button>
-        <button class="bad delete">🗑 Löschen</button>
-      </div>
-    `;
-    div.querySelector(".de").textContent = e.deutsch;
-    div.querySelector(".en").textContent = variants(e.englisch)[0];
-    div.querySelector(".meta").textContent =
-      `Richtig: ${e.richtig||0} · Falsch: ${e.falsch||0} · Treffer: ${quote}`;
-    div.querySelector(".speak").onclick = () => speak(variants(e.englisch)[0]);
-    div.querySelector(".reset").onclick = async () => {
-      e.richtig=0; e.falsch=0; e.serie=0;
-      e.letzteWiederholung=null; e.naechsteWiederholung=null;
-      await putEntry(e); await renderList(); await renderStats();
-    };
-    div.querySelector(".delete").onclick = async () => {
-      if (confirm("Diesen Eintrag wirklich löschen?")) {
-        await deleteEntry(e.id);
-        if (current && current.id === e.id) current = null;
-        await renderList(); await renderStats();
-      }
-    };
-    list.appendChild(div);
-  }
-}
-
-async function renderStats() {
-  const all = await getAllEntries();
-  const today = todayISO();
-
-  const total = all.length;
-  const right = all.reduce((s,e)=>s+(e.richtig||0),0);
-  const wrong = all.reduce((s,e)=>s+(e.falsch||0),0);
-  const hard = all.filter(e => (e.falsch||0)>0 && (e.falsch||0)>=(e.richtig||0)).length;
-  const due = all.filter(e => !e.naechsteWiederholung || e.naechsteWiederholung <= today).length;
-  const learned = all.filter(e => (e.serie||0) >= 5).length;
-
-  document.getElementById("statTotal").textContent = total;
-  document.getElementById("statRight").textContent = right;
-  document.getElementById("statWrong").textContent = wrong;
-  document.getElementById("statHard").textContent = hard;
-  document.getElementById("statDue").textContent = due;
-  document.getElementById("statLearned").textContent = learned;
-}
-
-function switchTab(id) {
-  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === id));
-  document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
-  if (id === "eintragen") renderList();
-  if (id === "fortschritt") renderStats();
-}
-
-async function exportBackup() {
-  const entries = await getAllEntries();
-  const data = {
-    app: "Mein Englisch-Trainer",
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    entries
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `englisch-trainer-backup-${todayISO()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
-async function importBackup(file) {
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    if (!data || !Array.isArray(data.entries)) throw new Error("Ungültige Sicherungsdatei.");
-
-    if (!confirm(`Sicherung mit ${data.entries.length} Einträgen importieren? Bestehende Daten werden ersetzt.`)) return;
-
-    await clearEntries();
-
-    for (const old of data.entries) {
-      const copy = {...old};
-      delete copy.id;
-      await addEntry(copy);
-    }
-
-    alert("Sicherung wurde importiert.");
-    current = null;
-    await renderList();
-    await renderStats();
-    await chooseQuestion();
-  } catch (err) {
-    alert("Import fehlgeschlagen: " + err.message);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  await openDB();
-
-  document.querySelectorAll(".tabbtn").forEach(btn => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-  });
-
-  document.getElementById("saveEntry").onclick = async () => {
-    const de = document.getElementById("deutsch").value.trim();
-    const en = document.getElementById("englisch").value.trim();
-    const status = document.getElementById("saveStatus");
-
-    if (!de || !en) {
-      status.textContent = "Bitte Deutsch und Englisch eingeben.";
-      return;
-    }
-
-    await addEntry({
-      deutsch: de,
-      englisch: en,
-      richtig: 0,
-      falsch: 0,
-      serie: 0,
-      letzteWiederholung: null,
-      naechsteWiederholung: null,
-      createdAt: new Date().toISOString()
-    });
-
-    document.getElementById("deutsch").value = "";
-    document.getElementById("englisch").value = "";
-    status.textContent = "✅ Gespeichert";
-    setTimeout(()=>status.textContent="", 1600);
-
-    await renderList();
-    await renderStats();
-    if (!current) await chooseQuestion();
-  };
-
-  document.getElementById("newQuestion").onclick = chooseQuestion;
-  document.getElementById("checkAnswer").onclick = checkCurrentAnswer;
-
-  document.getElementById("showAnswer").onclick = () => {
-    if (!current) return;
-    showResult(`Lösung:\n${variants(current.englisch)[0]}`, "warn");
-  };
-
-  document.getElementById("speakCorrect").onclick = () => {
-    if (!current) return;
-    speak(variants(current.englisch)[0]);
-  };
-
-  document.getElementById("manualCorrect").onclick = async () => {
-    if (!current) return;
-    await markCorrect(current, lastMarkedWrong);
-    lastMarkedWrong = false;
-    showResult("✅ ALS RICHTIG MARKIERT", "good");
-    document.getElementById("manualCorrect").classList.add("hidden");
-    await renderList();
-    await renderStats();
-  };
-
-  document.getElementById("mode").onchange = chooseQuestion;
-  document.getElementById("search").oninput = renderList;
-  document.getElementById("exportBtn").onclick = exportBackup;
-
-  document.getElementById("importBtn").onclick = () => {
-    document.getElementById("importFile").click();
-  };
-
-  document.getElementById("importFile").onchange = async (e) => {
-    if (e.target.files && e.target.files[0]) {
-      await importBackup(e.target.files[0]);
-      e.target.value = "";
-    }
-  };
-
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-
-  await renderList();
-  await renderStats();
-  await chooseQuestion();
-});
-</script>
-</body>
-</html>
+const DB_NAME="englishTrainerPrivate", DB_VERSION=1, STORE="entries";
+let db=null,todayCur=null,mistCur=null,sentCur=null,todayLast=null,mistLast=null,sentLast=null,todayWrong=false,mistWrong=false,sentWrong=false;
+
+const DICT={
+"hallo":["hello","Hallo, wie geht es dir?","Hello, how are you?"],
+"haus":["house","Das ist mein Haus.","This is my house."],
+"auto":["car","Mein Auto steht draußen.","My car is outside."],
+"arbeit":["work","Ich gehe heute zur Arbeit.","I am going to work today."],
+"computer":["computer","Ich arbeite am Computer.","I work on the computer."],
+"wasser":["water","Ich trinke Wasser.","I drink water."],
+"kaffee":["coffee","Ich möchte einen Kaffee.","I would like a coffee."],
+"essen":["food","Das Essen ist gut.","The food is good."],
+"freund":["friend","Er ist mein Freund.","He is my friend."],
+"familie":["family","Meine Familie ist wichtig für mich.","My family is important to me."],
+"heute":["today","Heute lerne ich Englisch.","Today I am learning English."],
+"morgen":["tomorrow","Morgen gehe ich arbeiten.","Tomorrow I am going to work."],
+"stadt":["city","Die Stadt ist groß.","The city is big."],
+"bahnhof":["train station","Wo ist der Bahnhof?","Where is the train station?"],
+"zug":["train","Der Zug kommt gleich.","The train is coming soon."],
+"flughafen":["airport","Wir fahren zum Flughafen.","We are going to the airport."],
+"hotel":["hotel","Unser Hotel ist am Strand.","Our hotel is near the beach."],
+"urlaub":["holiday","Ich bin im Urlaub.","I am on holiday."],
+"strand":["beach","Ich gehe heute zum Strand.","I am going to the beach today."],
+"meer":["sea","Das Meer ist ruhig.","The sea is calm."],
+"see":["lake","Ich bin heute am See.","I am at the lake today."],
+"wind":["wind","Heute gibt es viel Wind.","There is a lot of wind today."],
+"windsurfen":["windsurfing","Ich gehe heute windsurfen.","I am going windsurfing today."],
+"segel":["sail","Das Segel ist groß.","The sail is big."],
+"brett":["board","Mein Brett liegt am Strand.","My board is on the beach."],
+"laufen":["running","Ich gehe heute laufen.","I am going running today."],
+"wandern":["hiking","Wir gehen am Wochenende wandern.","We are going hiking at the weekend."],
+"lernen":["learn","Ich möchte Englisch lernen.","I want to learn English."],
+"sprechen":["speak","Ich möchte besser Englisch sprechen.","I want to speak English better."],
+"lesen":["read","Ich lese jeden Tag.","I read every day."],
+"schreiben":["write","Ich schreibe eine Nachricht.","I am writing a message."],
+"gehen":["go","Ich gehe jetzt nach Hause.","I am going home now."],
+"kommen":["come","Kommst du morgen?","Are you coming tomorrow?"],
+"fahren":["drive","Ich fahre zur Arbeit.","I drive to work."],
+"arbeiten":["work","Ich arbeite heute.","I am working today."],
+"kaufen":["buy","Ich möchte das kaufen.","I would like to buy that."],
+"brauchen":["need","Ich brauche Hilfe.","I need help."],
+"gut":["good","Das ist gut.","That is good."],
+"schlecht":["bad","Das Wetter ist schlecht.","The weather is bad."],
+"groß":["big","Das Haus ist groß.","The house is big."],
+"klein":["small","Das Zimmer ist klein.","The room is small."],
+"schnell":["fast","Das Auto ist schnell.","The car is fast."],
+"langsam":["slow","Bitte sprich langsam.","Please speak slowly."],
+"schön":["beautiful","Der Strand ist schön.","The beach is beautiful."],
+"kalt":["cold","Das Wasser ist kalt.","The water is cold."],
+"warm":["warm","Heute ist es warm.","It is warm today."],
+"wer":["who","Wer ist das?","Who is that?"],
+"was":["what","Was ist das?","What is that?"],
+"wo":["where","Wo ist das Hotel?","Where is the hotel?"],
+"wann":["when","Wann kommst du?","When are you coming?"],
+"warum":["why","Warum lernst du Englisch?","Why are you learning English?"],
+"wie":["how","Wie geht es dir?","How are you?"],
+"ja":["yes","Ja, das ist richtig.","Yes, that is correct."],
+"nein":["no","Nein, danke.","No, thank you."],
+"bitte":["please","Bitte sprich langsam.","Please speak slowly."],
+"danke":["thank you","Danke für deine Hilfe.","Thank you for your help."]
+};
+
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:"id",autoIncrement:true})};r.onsuccess=e=>{db=e.target.result;res(db)};r.onerror=()=>rej(r.error)})}
+function all(){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readonly").objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}
+function add(e){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).add(e);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function put(e){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).put(e);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+function del(id){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+function clearAll(){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+
+const today=()=>new Date().toISOString().slice(0,10);
+function plusDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function vars(t){return String(t||"").split("|").map(x=>x.trim()).filter(Boolean)}
+function norm(s){s=String(s||"").toLowerCase().trim();const r={"i'm":"i am","you're":"you are","he's":"he is","she's":"she is","it's":"it is","we're":"we are","they're":"they are","can't":"cannot","don't":"do not","doesn't":"does not"};for(const[a,b]of Object.entries(r))s=s.split(a).join(b);return s.replace(/[^\p{L}\p{N}\s']/gu,"").replace(/\s+/g," ").trim()}
+function sim(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;if(a===b)return 1;const m=a.length,n=b.length,dp=Array.from({length:m+1},()=>Array(n+1).fill(0));for(let i=0;i<=m;i++)dp[i][0]=i;for(let j=0;j<=n;j++)dp[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){const c=a[i-1]===b[j-1]?0:1;dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+c)}return 1-dp[m][n]/Math.max(m,n)}
+function best(a,e){let o={score:0,text:e};for(const v of vars(e)){const s=sim(a,v);if(s>o.score)o={score:s,text:v}}return o}
+const due=e=>!e.naechsteWiederholung||e.naechsteWiederholung<=today();
+const hard=e=>(e.falsch||0)>0&&(e.falsch||0)>=(e.richtig||0);
+const learned=e=>(e.serie||0)>=5;
+function hasSentence(e){return (e.satzDeutsch&&e.satzEnglisch)||(String(e.deutsch||"").includes(" ")&&String(e.englisch||"").includes(" "))}
+function pair(e){return e.satzDeutsch&&e.satzEnglisch?{de:e.satzDeutsch,en:e.satzEnglisch}:{de:e.deutsch,en:e.englisch}}
+function weight(e){let w=1+(e.falsch||0)*3;if((e.richtig||0)+(e.falsch||0)===0)w+=4;if((e.richtig||0)<3)w+=3-(e.richtig||0);if(due(e))w+=3;if(learned(e))w=Math.max(1,w-3);return w}
+function choose(arr,last){if(!arr.length)return null;let x=arr.filter(e=>arr.length===1||e.id!==last);if(!x.length)x=arr;const ws=x.map(weight),sum=ws.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<x.length;i++){r-=ws[i];if(r<=0)return x[i]}return x.at(-1)}
+function show(id,text,kind){const el=document.getElementById(id);el.textContent=text;el.className=`result ${kind}`}
+function clearR(id){const el=document.getElementById(id);el.textContent="";el.className="result"}
+function speak(t){if(!t)return;if(!("speechSynthesis"in window)){alert("Vorlesen wird nicht unterstützt.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-GB";u.rate=.88;speechSynthesis.speak(u)}
+async function right(e,undo=false){e.richtig=(e.richtig||0)+1;if(undo&&(e.falsch||0)>0)e.falsch--;e.serie=(e.serie||0)+1;let d=1;if(e.serie===2)d=2;else if(e.serie===3)d=4;else if(e.serie===4)d=7;else if(e.serie===5)d=14;else if(e.serie>=6)d=30;e.naechsteWiederholung=plusDays(d);e.letzteWiederholung=today();await put(e)}
+async function wrong(e){e.falsch=(e.falsch||0)+1;e.serie=0;e.naechsteWiederholung=today();e.letzteWiederholung=today();await put(e)}
+
+async function nextToday(){const a=await all(),d=a.filter(due);document.getElementById("todayCount").textContent=`${d.length} Aufgaben fällig`;const pool=d.length?d:a;if(!pool.length){todayCur=null;document.getElementById("todayQ").textContent="Bitte zuerst ein Wort eintragen.";return}todayCur=choose(pool,todayLast);todayLast=todayCur.id;todayWrong=false;document.getElementById("todayQ").textContent=todayCur.deutsch;document.getElementById("todayA").value="";document.getElementById("todayManual").classList.add("hidden");clearR("todayR")}
+async function nextMist(){const a=await all(),d=a.filter(hard);document.getElementById("mistCount").textContent=d.length?`${d.length} schwierige Einträge`:"Keine schwierigen Wörter";if(!d.length){mistCur=null;document.getElementById("mistQ").textContent="Zurzeit keine Fehler zu wiederholen.";return}mistCur=choose(d,mistLast);mistLast=mistCur.id;mistWrong=false;document.getElementById("mistQ").textContent=mistCur.deutsch;document.getElementById("mistA").value="";document.getElementById("mistManual").classList.add("hidden");clearR("mistR")}
+async function nextSent(){const a=await all(),d=a.filter(hasSentence);document.getElementById("sentCount").textContent=`${d.length} Sätze vorhanden`;if(!d.length){sentCur=null;document.getElementById("sentQ").textContent="Noch kein Beispielsatz gespeichert.";return}sentCur=choose(d,sentLast);sentLast=sentCur.id;sentWrong=false;document.getElementById("sentQ").textContent=pair(sentCur).de;document.getElementById("sentA").value="";document.getElementById("sentManual").classList.add("hidden");clearR("sentR")}
+async function check(kind){let c,aId,rId,mId,exp;if(kind==="today"){c=todayCur;aId="todayA";rId="todayR";mId="todayManual";exp=c?.englisch}if(kind==="mist"){c=mistCur;aId="mistA";rId="mistR";mId="mistManual";exp=c?.englisch}if(kind==="sent"){c=sentCur;aId="sentA";rId="sentR";mId="sentManual";exp=c?pair(c).en:null}if(!c)return;const ans=document.getElementById(aId).value.trim();if(!ans){show(rId,"Bitte zuerst antworten.","warn");return}const b=best(ans,exp);if(b.score>=.9){await right(c);show(rId,"✅ RICHTIG","good");document.getElementById(mId).classList.add("hidden")}else{await wrong(c);show(rId,b.score>=.72?`🟡 FAST RICHTIG\nRichtig: ${b.text}`:`❌ NOCH NICHT RICHTIG\nRichtig: ${b.text}`,b.score>=.72?"warn":"bad");document.getElementById(mId).classList.remove("hidden");if(kind==="today")todayWrong=true;if(kind==="mist")mistWrong=true;if(kind==="sent")sentWrong=true}await refresh()}
+async function manual(kind){let c,w,r,m;if(kind==="today"){c=todayCur;w=todayWrong;r="todayR";m="todayManual";todayWrong=false}if(kind==="mist"){c=mistCur;w=mistWrong;r="mistR";m="mistManual";mistWrong=false}if(kind==="sent"){c=sentCur;w=sentWrong;r="sentR";m="sentManual";sentWrong=false}if(!c)return;await right(c,w);show(r,"✅ ALS RICHTIG MARKIERT","good");document.getElementById(m).classList.add("hidden");await refresh()}
+
+function suggest(){const key=document.getElementById("german").value.toLowerCase().trim().replace(/[.!?,;:]/g,""),x=DICT[key],box=document.getElementById("suggest");if(!x){box.classList.remove("show");return}box.classList.add("show");document.getElementById("suggestText").textContent=`${x[0]} · Beispiel: ${x[2]}`;if(!document.getElementById("english").value)document.getElementById("english").value=x[0];if(!document.getElementById("sentenceDe").value)document.getElementById("sentenceDe").value=x[1];if(!document.getElementById("sentenceEn").value)document.getElementById("sentenceEn").value=x[2]}
+async function save(){const de=document.getElementById("german").value.trim(),en=document.getElementById("english").value.trim(),sd=document.getElementById("sentenceDe").value.trim(),se=document.getElementById("sentenceEn").value.trim();if(!de||!en){document.getElementById("saveStatus").textContent="Bitte Deutsch und Englisch eingeben.";return}await add({deutsch:de,englisch:en,satzDeutsch:sd,satzEnglisch:se,richtig:0,falsch:0,serie:0,letzteWiederholung:null,naechsteWiederholung:null});["german","english","sentenceDe","sentenceEn"].forEach(i=>document.getElementById(i).value="");document.getElementById("suggest").classList.remove("show");document.getElementById("saveStatus").textContent="✅ Gespeichert";await refresh();await nextToday()}
+async function renderList(){const a=await all(),q=document.getElementById("search").value.toLowerCase().trim(),list=document.getElementById("list");list.innerHTML="";for(const e of a.filter(e=>!q||e.deutsch.toLowerCase().includes(q)||e.englisch.toLowerCase().includes(q)).sort((a,b)=>b.id-a.id)){const p=hasSentence(e)?pair(e):null,d=document.createElement("div");d.className="item";let badge=hard(e)?'<span class="badge hard">⚠ schwierig</span>':learned(e)?'<span class="badge learned">✓ gut gelernt</span>':due(e)?'<span class="badge due">heute fällig</span>':"";d.innerHTML=`<div class="de"></div><div class="en"></div>${p?'<div class="sentence"></div>':""}${badge}<div class="meta"></div><div class="actions"><button class="lw">🔊 Wort</button>${p?'<button class="ls">🔊 Satz</button>':""}<button class="reset">↩ Reset</button><button class="del bad">🗑</button></div>`;d.querySelector(".de").textContent=e.deutsch;d.querySelector(".en").textContent=vars(e.englisch)[0];if(p)d.querySelector(".sentence").textContent=`Satz: ${p.en}`;d.querySelector(".meta").textContent=`Richtig ${e.richtig||0} · Falsch ${e.falsch||0} · Serie ${e.serie||0}`;d.querySelector(".lw").onclick=()=>speak(vars(e.englisch)[0]);if(p)d.querySelector(".ls").onclick=()=>speak(vars(p.en)[0]);d.querySelector(".reset").onclick=async()=>{e.richtig=0;e.falsch=0;e.serie=0;e.letzteWiederholung=null;e.naechsteWiederholung=null;await put(e);await refresh()};d.querySelector(".del").onclick=async()=>{if(confirm("Diesen Eintrag löschen?")){await del(e.id);await refresh()}};list.appendChild(d)}}
+async function stats(){const a=await all();document.getElementById("sTotal").textContent=a.length;document.getElementById("sDue").textContent=a.filter(due).length;document.getElementById("sHard").textContent=a.filter(hard).length;document.getElementById("sLearned").textContent=a.filter(learned).length;document.getElementById("sRight").textContent=a.reduce((s,e)=>s+(e.richtig||0),0);document.getElementById("sWrong").textContent=a.reduce((s,e)=>s+(e.falsch||0),0)}
+async function refresh(){await renderList();await stats();const a=await all();document.getElementById("todayCount").textContent=`${a.filter(due).length} Aufgaben fällig`;document.getElementById("mistCount").textContent=a.filter(hard).length?`${a.filter(hard).length} schwierige Einträge`:"Keine schwierigen Wörter";document.getElementById("sentCount").textContent=`${a.filter(hasSentence).length} Sätze vorhanden`}
+async function exportData(){const data={app:"Mein Englisch-Trainer",version:2,entries:await all()},blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`englisch-backup-${today()}.json`;a.click();URL.revokeObjectURL(url)}
+async function importData(file){try{const d=JSON.parse(await file.text());if(!Array.isArray(d.entries))throw Error("Ungültige Datei");if(!confirm("Bestehende Daten ersetzen?"))return;await clearAll();for(const old of d.entries){const c={...old};delete c.id;await add(c)}await refresh();await nextToday();alert("Sicherung importiert.")}catch(e){alert("Import fehlgeschlagen.")}}
+function tab(id){document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));if(id==="today")nextToday();if(id==="mistakes")nextMist();if(id==="sentences")nextSent();if(id==="add")renderList();if(id==="progress")stats()}
+
+document.addEventListener("DOMContentLoaded",async()=>{await openDB();
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+german.oninput=suggest;save.onclick=save;listenWord.onclick=()=>speak(english.value.trim());listenSentence.onclick=()=>speak(sentenceEn.value.trim());search.oninput=renderList;
+todayNext.onclick=nextToday;todayListen.onclick=()=>todayCur&&speak(vars(todayCur.englisch)[0]);todayCheck.onclick=()=>check("today");todayManual.onclick=()=>manual("today");
+mistNext.onclick=nextMist;mistListen.onclick=()=>mistCur&&speak(vars(mistCur.englisch)[0]);mistCheck.onclick=()=>check("mist");mistManual.onclick=()=>manual("mist");
+sentNext.onclick=nextSent;sentListen.onclick=()=>sentCur&&speak(vars(pair(sentCur).en)[0]);sentCheck.onclick=()=>check("sent");sentManual.onclick=()=>manual("sent");
+export.onclick=exportData;import.onclick=()=>importFile.click();importFile.onchange=e=>e.target.files?.[0]&&importData(e.target.files[0]);
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+await refresh();await nextToday()});
+</script></body></html>
