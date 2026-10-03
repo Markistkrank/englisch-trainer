@@ -26,9 +26,10 @@ label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,t
 </style>
 </head>
 <body><div class="app">
-<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Privat · kostenlos · lokal auf deinem iPhone</p>
+<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Version 2.2 · privat · lokal auf deinem iPhone</p>
 <div class="privacy">🔒 Deine Wörter, Sätze und dein Lernstand bleiben auf deinem Gerät.</div>
 
+<div id="appStatus" role="status" class="privacy">Lerninhalte werden geladen …</div>
 <nav>
 <button class="nav active" data-tab="today"><span>🎯</span>Heute</button>
 <button class="nav" data-tab="mistakes"><span>🔁</span>Fehler</button>
@@ -147,12 +148,22 @@ const DICT={
 "danke":["thank you","Danke für deine Hilfe.","Thank you for your help."]
 };
 
-function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:"id",autoIncrement:true})};r.onsuccess=e=>{db=e.target.result;res(db)};r.onerror=()=>rej(r.error)})}
+function openDB(){return new Promise((res,rej)=>{
+// No explicit version: existing databases from newer app versions stay accessible.
+const r=indexedDB.open(DB_NAME);
+r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:"id",autoIncrement:true})};
+r.onblocked=()=>status("Bitte andere geöffnete Tabs dieser App schließen und neu laden.");
+r.onsuccess=e=>{db=e.target.result;db.onversionchange=()=>{db.close();status("Die App wurde aktualisiert. Bitte neu laden.")};if(!db.objectStoreNames.contains(STORE)){db.close();rej(new Error("Der Speicher für Lerninhalte fehlt. Bitte vorhandene Sicherung bereithalten."));return}res(db)};
+r.onerror=()=>rej(r.error)
+})}
+function status(message){document.getElementById("appStatus").textContent=message}
+function reportError(error){console.error(error);status("Lerninhalte konnten nicht geladen oder gespeichert werden ("+(error?.name||"Fehler")+"). Bitte die App neu öffnen. Keine Website-Daten löschen.")}
 function all(){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readonly").objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}
-function add(e){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).add(e);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-function put(e){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).put(e);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
-function del(id){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
-function clearAll(){return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+function write(method,value){return new Promise((res,rej)=>{const tx=db.transaction(STORE,"readwrite"),r=tx.objectStore(STORE)[method](value);tx.oncomplete=()=>res(r.result);tx.onabort=()=>rej(tx.error||r.error||new Error("Speichern abgebrochen"));tx.onerror=()=>rej(tx.error||r.error)})}
+function add(e){return write("add",e)}
+function put(e){return write("put",e)}
+function del(id){return write("delete",id)}
+function replaceEntries(entries){return new Promise((res,rej)=>{const tx=db.transaction(STORE,"readwrite"),store=tx.objectStore(STORE);tx.oncomplete=res;tx.onabort=()=>rej(tx.error||new Error("Import abgebrochen"));try{store.clear();for(const old of entries){const c={...old};delete c.id;store.add(c)}}catch(error){tx.abort();rej(error)}})}
 
 const today=()=>new Date().toISOString().slice(0,10);
 function plusDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
@@ -181,14 +192,14 @@ async function manual(kind){let c,w,r,m;if(kind==="today"){c=todayCur;w=todayWro
 
 function suggest(){const key=document.getElementById("german").value.toLowerCase().trim().replace(/[.!?,;:]/g,""),x=DICT[key],box=document.getElementById("suggest");if(!x){box.classList.remove("show");return}box.classList.add("show");document.getElementById("suggestText").textContent=`${x[0]} · Beispiel: ${x[2]}`;if(!document.getElementById("english").value)document.getElementById("english").value=x[0];if(!document.getElementById("sentenceDe").value)document.getElementById("sentenceDe").value=x[1];if(!document.getElementById("sentenceEn").value)document.getElementById("sentenceEn").value=x[2]}
 async function save(){const de=document.getElementById("german").value.trim(),en=document.getElementById("english").value.trim(),sd=document.getElementById("sentenceDe").value.trim(),se=document.getElementById("sentenceEn").value.trim();if(!de||!en){document.getElementById("saveStatus").textContent="Bitte Deutsch und Englisch eingeben.";return}await add({deutsch:de,englisch:en,satzDeutsch:sd,satzEnglisch:se,richtig:0,falsch:0,serie:0,letzteWiederholung:null,naechsteWiederholung:null});["german","english","sentenceDe","sentenceEn"].forEach(i=>document.getElementById(i).value="");document.getElementById("suggest").classList.remove("show");document.getElementById("saveStatus").textContent="✅ Gespeichert";await refresh();await nextToday()}
-async function renderList(){const a=await all(),q=document.getElementById("search").value.toLowerCase().trim(),list=document.getElementById("list");list.innerHTML="";for(const e of a.filter(e=>!q||e.deutsch.toLowerCase().includes(q)||e.englisch.toLowerCase().includes(q)).sort((a,b)=>b.id-a.id)){const p=hasSentence(e)?pair(e):null,d=document.createElement("div");d.className="item";let badge=hard(e)?'<span class="badge hard">⚠ schwierig</span>':learned(e)?'<span class="badge learned">✓ gut gelernt</span>':due(e)?'<span class="badge due">heute fällig</span>':"";d.innerHTML=`<div class="de"></div><div class="en"></div>${p?'<div class="sentence"></div>':""}${badge}<div class="meta"></div><div class="actions"><button class="lw">🔊 Wort</button>${p?'<button class="ls">🔊 Satz</button>':""}<button class="reset">↩ Reset</button><button class="del bad">🗑</button></div>`;d.querySelector(".de").textContent=e.deutsch;d.querySelector(".en").textContent=vars(e.englisch)[0];if(p)d.querySelector(".sentence").textContent=`Satz: ${p.en}`;d.querySelector(".meta").textContent=`Richtig ${e.richtig||0} · Falsch ${e.falsch||0} · Serie ${e.serie||0}`;d.querySelector(".lw").onclick=()=>speak(vars(e.englisch)[0]);if(p)d.querySelector(".ls").onclick=()=>speak(vars(p.en)[0]);d.querySelector(".reset").onclick=async()=>{e.richtig=0;e.falsch=0;e.serie=0;e.letzteWiederholung=null;e.naechsteWiederholung=null;await put(e);await refresh()};d.querySelector(".del").onclick=async()=>{if(confirm("Diesen Eintrag löschen?")){await del(e.id);await refresh()}};list.appendChild(d)}}
+async function renderList(){const a=await all(),q=document.getElementById("search").value.toLowerCase().trim(),list=document.getElementById("list");list.innerHTML="";for(const e of a.filter(e=>!q||String(e.deutsch||"").toLowerCase().includes(q)||String(e.englisch||"").toLowerCase().includes(q)).sort((a,b)=>b.id-a.id)){const p=hasSentence(e)?pair(e):null,d=document.createElement("div");d.className="item";let badge=hard(e)?'<span class="badge hard">⚠ schwierig</span>':learned(e)?'<span class="badge learned">✓ gut gelernt</span>':due(e)?'<span class="badge due">heute fällig</span>':"";d.innerHTML=`<div class="de"></div><div class="en"></div>${p?'<div class="sentence"></div>':""}${badge}<div class="meta"></div><div class="actions"><button class="lw">🔊 Wort</button>${p?'<button class="ls">🔊 Satz</button>':""}<button class="reset">↩ Reset</button><button class="del bad">🗑</button></div>`;d.querySelector(".de").textContent=e.deutsch;d.querySelector(".en").textContent=vars(e.englisch)[0];if(p)d.querySelector(".sentence").textContent=`Satz: ${p.en}`;d.querySelector(".meta").textContent=`Richtig ${e.richtig||0} · Falsch ${e.falsch||0} · Serie ${e.serie||0}`;d.querySelector(".lw").onclick=()=>speak(vars(e.englisch)[0]);if(p)d.querySelector(".ls").onclick=()=>speak(vars(p.en)[0]);d.querySelector(".reset").onclick=async()=>{e.richtig=0;e.falsch=0;e.serie=0;e.letzteWiederholung=null;e.naechsteWiederholung=null;await put(e);await refresh()};d.querySelector(".del").onclick=async()=>{if(confirm("Diesen Eintrag löschen?")){await del(e.id);await refresh()}};list.appendChild(d)}}
 async function stats(){const a=await all();document.getElementById("sTotal").textContent=a.length;document.getElementById("sDue").textContent=a.filter(due).length;document.getElementById("sHard").textContent=a.filter(hard).length;document.getElementById("sLearned").textContent=a.filter(learned).length;document.getElementById("sRight").textContent=a.reduce((s,e)=>s+(e.richtig||0),0);document.getElementById("sWrong").textContent=a.reduce((s,e)=>s+(e.falsch||0),0)}
 async function refresh(){await renderList();await stats();const a=await all();document.getElementById("todayCount").textContent=`${a.filter(due).length} Aufgaben fällig`;document.getElementById("mistCount").textContent=a.filter(hard).length?`${a.filter(hard).length} schwierige Einträge`:"Keine schwierigen Wörter";document.getElementById("sentCount").textContent=`${a.filter(hasSentence).length} Sätze vorhanden`}
 async function exportData(){const data={app:"Mein Englisch-Trainer",version:2,entries:await all()},blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`englisch-backup-${today()}.json`;a.click();URL.revokeObjectURL(url)}
-async function importData(file){try{const d=JSON.parse(await file.text());if(!Array.isArray(d.entries))throw Error("Ungültige Datei");if(!confirm("Bestehende Daten ersetzen?"))return;await clearAll();for(const old of d.entries){const c={...old};delete c.id;await add(c)}await refresh();await nextToday();alert("Sicherung importiert.")}catch(e){alert("Import fehlgeschlagen.")}}
+async function importData(file){try{const d=JSON.parse(await file.text());if(!Array.isArray(d.entries)||!d.entries.every(e=>e&&typeof e.deutsch==="string"&&e.deutsch.trim()&&typeof e.englisch==="string"&&e.englisch.trim()))throw Error("Ungültige Datei");if(!confirm("Bestehende Daten ersetzen?"))return;await replaceEntries(d.entries);await refresh();await nextToday();alert("Sicherung importiert.")}catch(e){alert("Import fehlgeschlagen.")}}
 function tab(id){document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));if(id==="today")nextToday();if(id==="mistakes")nextMist();if(id==="sentences")nextSent();if(id==="add")renderList();if(id==="progress")stats()}
 
-document.addEventListener("DOMContentLoaded",async()=>{await openDB();
+document.addEventListener("DOMContentLoaded",async()=>{
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 document.getElementById("german").oninput=suggest;
 document.getElementById("save").onclick=save;
@@ -211,5 +222,13 @@ document.getElementById("export").onclick=exportData;
 document.getElementById("import").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=e=>e.target.files?.[0]&&importData(e.target.files[0]);
 if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
-await refresh();await nextToday()});
+// Attach navigation before opening storage so an error cannot freeze every tab.
+const ready=openDB();ready.catch(reportError);
+for(const el of document.querySelectorAll("button,input")){
+for(const event of ["onclick","oninput","onchange"]){const handler=el[event];if(handler)el[event]=async function(e){try{await ready;await handler.call(this,e)}catch(error){reportError(error)}}}
+}
+// Tabs themselves remain usable even when storage cannot be opened.
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===b.dataset.tab));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));ready.then(()=>tab(b.dataset.tab)).catch(reportError)});
+try{await ready;await nextToday();await refresh();status("Version 2.2 · Lerninhalte geladen")}catch(error){reportError(error);document.getElementById("todayQ").textContent="Bitte den Hinweis oben beachten."}
+});
 </script></body></html>
