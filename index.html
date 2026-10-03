@@ -190,11 +190,26 @@ function tab(id){document.querySelectorAll(".panel").forEach(p=>p.classList.togg
 
 document.addEventListener("DOMContentLoaded",async()=>{await openDB();
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
-german.oninput=suggest;save.onclick=save;listenWord.onclick=()=>speak(english.value.trim());listenSentence.onclick=()=>speak(sentenceEn.value.trim());search.oninput=renderList;
-todayNext.onclick=nextToday;todayListen.onclick=()=>todayCur&&speak(vars(todayCur.englisch)[0]);todayCheck.onclick=()=>check("today");todayManual.onclick=()=>manual("today");
-mistNext.onclick=nextMist;mistListen.onclick=()=>mistCur&&speak(vars(mistCur.englisch)[0]);mistCheck.onclick=()=>check("mist");mistManual.onclick=()=>manual("mist");
-sentNext.onclick=nextSent;sentListen.onclick=()=>sentCur&&speak(vars(pair(sentCur).en)[0]);sentCheck.onclick=()=>check("sent");sentManual.onclick=()=>manual("sent");
-export.onclick=exportData;import.onclick=()=>importFile.click();importFile.onchange=e=>e.target.files?.[0]&&importData(e.target.files[0]);
+document.getElementById("german").oninput=suggest;
+document.getElementById("save").onclick=save;
+document.getElementById("listenWord").onclick=()=>speak(document.getElementById("english").value.trim());
+document.getElementById("listenSentence").onclick=()=>speak(document.getElementById("sentenceEn").value.trim());
+document.getElementById("search").oninput=renderList;
+document.getElementById("todayNext").onclick=nextToday;
+document.getElementById("todayListen").onclick=()=>todayCur&&speak(vars(todayCur.englisch)[0]);
+document.getElementById("todayCheck").onclick=()=>check("today");
+document.getElementById("todayManual").onclick=()=>manual("today");
+document.getElementById("mistNext").onclick=nextMist;
+document.getElementById("mistListen").onclick=()=>mistCur&&speak(vars(mistCur.englisch)[0]);
+document.getElementById("mistCheck").onclick=()=>check("mist");
+document.getElementById("mistManual").onclick=()=>manual("mist");
+document.getElementById("sentNext").onclick=nextSent;
+document.getElementById("sentListen").onclick=()=>sentCur&&speak(vars(pair(sentCur).en)[0]);
+document.getElementById("sentCheck").onclick=()=>check("sent");
+document.getElementById("sentManual").onclick=()=>manual("sent");
+document.getElementById("export").onclick=exportData;
+document.getElementById("import").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=e=>e.target.files?.[0]&&importData(e.target.files[0]);
 if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
 await refresh();await nextToday()});
 </script></body></html>
