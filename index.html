@@ -21,12 +21,12 @@ button,input,textarea{font:inherit}button{border:0;border-radius:13px;padding:11
 label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,textarea{width:100%;background:#0f172a;color:white;border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}textarea{min-height:74px}.ans{font-size:1.15rem}
 .result{display:none;margin-top:10px;padding:12px;border-radius:13px;text-align:center;font-weight:800;white-space:pre-line}.result.good{display:block;background:rgba(21,128,61,.2)}.result.warn{display:block;background:rgba(161,98,7,.2)}.result.bad{display:block;background:rgba(185,28,28,.2)}
 .hidden{display:none!important}.small{font-size:.88rem;color:var(--muted);line-height:1.4}.item{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:11px;margin:8px 0}.item .de{font-weight:800}.item .en{color:#bfdbfe;margin-top:3px}.item .sentence{font-size:.9rem;color:#cbd5e1;margin-top:6px}.meta{font-size:.82rem;color:var(--muted);margin-top:6px}.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.actions button{flex:1;min-height:38px;padding:7px}
-.suggest{display:none;background:#10213b;border:1px solid #2563eb;border-radius:12px;padding:10px;margin-top:8px}.suggest.show{display:block}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}.stat b{display:block;font-size:1.7rem;margin-top:4px}
+.suggest{display:none;background:#10213b;border:1px solid #2563eb;border-radius:12px;padding:10px;margin-top:8px}.suggest.show{display:block}.suggest-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.suggest-btn{min-height:34px;padding:6px 9px;border:1px solid #3b82f6;background:#172554;font-size:.88rem}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}.stat b{display:block;font-size:1.7rem;margin-top:4px}
 .badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:.75rem;margin-top:6px}.hard{background:#7f1d1d;color:#fecaca}.due{background:#713f12;color:#fde68a}.learned{background:#14532d;color:#bbf7d0}
 </style>
 </head>
 <body><div class="app">
-<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Version 2.2 · privat · lokal auf deinem iPhone</p>
+<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Version 2.3 · privat · lokal auf deinem iPhone</p>
 <div class="privacy">🔒 Deine Wörter, Sätze und dein Lernstand bleiben auf deinem Gerät.</div>
 
 <div id="appStatus" role="status" class="privacy">Lerninhalte werden geladen …</div>
@@ -65,7 +65,7 @@ label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,t
 <section id="add" class="panel">
 <div class="card"><h2>➕ Wort oder Satz hinzufügen</h2>
 <label>Deutsch</label><input id="german" placeholder="z. B. Strand">
-<div id="suggest" class="suggest"><b>💡 Lokaler Vorschlag</b><div id="suggestText" class="small"></div></div>
+<div id="suggest" class="suggest"><b>💡 A1-Grundwortschatz (lokal)</b><div id="suggestText" class="small"></div><div id="suggestList" class="suggest-list"></div></div>
 <label>Englisch</label><input id="english" placeholder="z. B. beach" autocapitalize="off">
 <label>Beispielsatz Deutsch (optional)</label><textarea id="sentenceDe"></textarea>
 <label>Beispielsatz Englisch (optional)</label><textarea id="sentenceEn" autocapitalize="off"></textarea>
@@ -90,62 +90,2556 @@ const DB_NAME="englishTrainerPrivate", DB_VERSION=1, STORE="entries";
 let db=null,todayCur=null,mistCur=null,sentCur=null,todayLast=null,mistLast=null,sentLast=null,todayWrong=false,mistWrong=false,sentWrong=false;
 
 const DICT={
-"hallo":["hello","Hallo, wie geht es dir?","Hello, how are you?"],
-"haus":["house","Das ist mein Haus.","This is my house."],
-"auto":["car","Mein Auto steht draußen.","My car is outside."],
-"arbeit":["work","Ich gehe heute zur Arbeit.","I am going to work today."],
-"computer":["computer","Ich arbeite am Computer.","I work on the computer."],
-"wasser":["water","Ich trinke Wasser.","I drink water."],
-"kaffee":["coffee","Ich möchte einen Kaffee.","I would like a coffee."],
-"essen":["food","Das Essen ist gut.","The food is good."],
-"freund":["friend","Er ist mein Freund.","He is my friend."],
-"familie":["family","Meine Familie ist wichtig für mich.","My family is important to me."],
-"heute":["today","Heute lerne ich Englisch.","Today I am learning English."],
-"morgen":["tomorrow","Morgen gehe ich arbeiten.","Tomorrow I am going to work."],
-"stadt":["city","Die Stadt ist groß.","The city is big."],
-"bahnhof":["train station","Wo ist der Bahnhof?","Where is the train station?"],
-"zug":["train","Der Zug kommt gleich.","The train is coming soon."],
-"flughafen":["airport","Wir fahren zum Flughafen.","We are going to the airport."],
-"hotel":["hotel","Unser Hotel ist am Strand.","Our hotel is near the beach."],
-"urlaub":["holiday","Ich bin im Urlaub.","I am on holiday."],
-"strand":["beach","Ich gehe heute zum Strand.","I am going to the beach today."],
-"meer":["sea","Das Meer ist ruhig.","The sea is calm."],
-"see":["lake","Ich bin heute am See.","I am at the lake today."],
-"wind":["wind","Heute gibt es viel Wind.","There is a lot of wind today."],
-"windsurfen":["windsurfing","Ich gehe heute windsurfen.","I am going windsurfing today."],
-"segel":["sail","Das Segel ist groß.","The sail is big."],
-"brett":["board","Mein Brett liegt am Strand.","My board is on the beach."],
-"laufen":["running","Ich gehe heute laufen.","I am going running today."],
-"wandern":["hiking","Wir gehen am Wochenende wandern.","We are going hiking at the weekend."],
-"lernen":["learn","Ich möchte Englisch lernen.","I want to learn English."],
-"sprechen":["speak","Ich möchte besser Englisch sprechen.","I want to speak English better."],
-"lesen":["read","Ich lese jeden Tag.","I read every day."],
-"schreiben":["write","Ich schreibe eine Nachricht.","I am writing a message."],
-"gehen":["go","Ich gehe jetzt nach Hause.","I am going home now."],
-"kommen":["come","Kommst du morgen?","Are you coming tomorrow?"],
-"fahren":["drive","Ich fahre zur Arbeit.","I drive to work."],
-"arbeiten":["work","Ich arbeite heute.","I am working today."],
-"kaufen":["buy","Ich möchte das kaufen.","I would like to buy that."],
-"brauchen":["need","Ich brauche Hilfe.","I need help."],
-"gut":["good","Das ist gut.","That is good."],
-"schlecht":["bad","Das Wetter ist schlecht.","The weather is bad."],
-"groß":["big","Das Haus ist groß.","The house is big."],
-"klein":["small","Das Zimmer ist klein.","The room is small."],
-"schnell":["fast","Das Auto ist schnell.","The car is fast."],
-"langsam":["slow","Bitte sprich langsam.","Please speak slowly."],
-"schön":["beautiful","Der Strand ist schön.","The beach is beautiful."],
-"kalt":["cold","Das Wasser ist kalt.","The water is cold."],
-"warm":["warm","Heute ist es warm.","It is warm today."],
-"wer":["who","Wer ist das?","Who is that?"],
-"was":["what","Was ist das?","What is that?"],
-"wo":["where","Wo ist das Hotel?","Where is the hotel?"],
-"wann":["when","Wann kommst du?","When are you coming?"],
-"warum":["why","Warum lernst du Englisch?","Why are you learning English?"],
-"wie":["how","Wie geht es dir?","How are you?"],
-"ja":["yes","Ja, das ist richtig.","Yes, that is correct."],
-"nein":["no","Nein, danke.","No, thank you."],
-"bitte":["please","Bitte sprich langsam.","Please speak slowly."],
-"danke":["thank you","Danke für deine Hilfe.","Thank you for your help."]
+  "ich": [
+    "I",
+    "",
+    ""
+  ],
+  "du": [
+    "you",
+    "",
+    ""
+  ],
+  "er": [
+    "he",
+    "",
+    ""
+  ],
+  "sie": [
+    "she | they",
+    "",
+    ""
+  ],
+  "es": [
+    "it",
+    "",
+    ""
+  ],
+  "wir": [
+    "we",
+    "",
+    ""
+  ],
+  "ihr": [
+    "her | their",
+    "",
+    ""
+  ],
+  "mein": [
+    "my",
+    "",
+    ""
+  ],
+  "meine": [
+    "my",
+    "",
+    ""
+  ],
+  "dein": [
+    "your",
+    "Ist das dein Buch?",
+    "Is that your book?"
+  ],
+  "deine": [
+    "your",
+    "",
+    ""
+  ],
+  "sein": [
+    "be",
+    "",
+    ""
+  ],
+  "seine": [
+    "his",
+    "",
+    ""
+  ],
+  "ihre": [
+    "her | their",
+    "",
+    ""
+  ],
+  "unser": [
+    "our",
+    "",
+    ""
+  ],
+  "unsere": [
+    "our",
+    "",
+    ""
+  ],
+  "euer": [
+    "your",
+    "",
+    ""
+  ],
+  "dies": [
+    "this",
+    "Dies ist mein Buch.",
+    "This is my book."
+  ],
+  "dieser": [
+    "this",
+    "",
+    ""
+  ],
+  "diese": [
+    "this",
+    "",
+    ""
+  ],
+  "dieses": [
+    "this",
+    "",
+    ""
+  ],
+  "das": [
+    "that | this",
+    "",
+    ""
+  ],
+  "der": [
+    "the",
+    "",
+    ""
+  ],
+  "die": [
+    "the",
+    "",
+    ""
+  ],
+  "ein": [
+    "a | an | one",
+    "Ich habe einen Hund.",
+    "I have a dog."
+  ],
+  "eine": [
+    "a | an | one",
+    "Das ist eine Katze.",
+    "That is a cat."
+  ],
+  "einen": [
+    "a | an | one",
+    "",
+    ""
+  ],
+  "einem": [
+    "a | an | one",
+    "",
+    ""
+  ],
+  "einer": [
+    "a | an | one",
+    "",
+    ""
+  ],
+  "selbst": [
+    "yourself | myself | himself | herself",
+    "Mach es selbst.",
+    "Do it yourself."
+  ],
+  "wer": [
+    "who",
+    "",
+    ""
+  ],
+  "was": [
+    "what",
+    "",
+    ""
+  ],
+  "wo": [
+    "where",
+    "",
+    ""
+  ],
+  "wohin": [
+    "where to",
+    "",
+    ""
+  ],
+  "woher": [
+    "where from",
+    "",
+    ""
+  ],
+  "wann": [
+    "when",
+    "",
+    ""
+  ],
+  "warum": [
+    "why",
+    "",
+    ""
+  ],
+  "wie": [
+    "how",
+    "",
+    ""
+  ],
+  "welcher": [
+    "which",
+    "",
+    ""
+  ],
+  "welche": [
+    "which",
+    "",
+    ""
+  ],
+  "welches": [
+    "which",
+    "",
+    ""
+  ],
+  "wessen": [
+    "whose",
+    "",
+    ""
+  ],
+  "ja": [
+    "yes",
+    "",
+    ""
+  ],
+  "nein": [
+    "no",
+    "",
+    ""
+  ],
+  "nicht": [
+    "not",
+    "",
+    ""
+  ],
+  "kein": [
+    "no | not any",
+    "",
+    ""
+  ],
+  "keine": [
+    "no | not any",
+    "",
+    ""
+  ],
+  "auch": [
+    "also | too",
+    "",
+    ""
+  ],
+  "nur": [
+    "only",
+    "",
+    ""
+  ],
+  "sehr": [
+    "very",
+    "",
+    ""
+  ],
+  "so": [
+    "so",
+    "",
+    ""
+  ],
+  "hier": [
+    "here",
+    "",
+    ""
+  ],
+  "dort": [
+    "there",
+    "",
+    ""
+  ],
+  "da": [
+    "there",
+    "",
+    ""
+  ],
+  "jetzt": [
+    "now",
+    "",
+    ""
+  ],
+  "dann": [
+    "then",
+    "",
+    ""
+  ],
+  "heute": [
+    "today",
+    "Heute lerne ich Englisch.",
+    "Today I am learning English."
+  ],
+  "morgen": [
+    "tomorrow | morning",
+    "Morgen gehe ich arbeiten.",
+    "Tomorrow I am going to work."
+  ],
+  "gestern": [
+    "yesterday",
+    "",
+    ""
+  ],
+  "immer": [
+    "always",
+    "",
+    ""
+  ],
+  "oft": [
+    "often",
+    "",
+    ""
+  ],
+  "manchmal": [
+    "sometimes",
+    "",
+    ""
+  ],
+  "nie": [
+    "never",
+    "",
+    ""
+  ],
+  "schon": [
+    "already",
+    "",
+    ""
+  ],
+  "noch": [
+    "still | yet",
+    "",
+    ""
+  ],
+  "wieder": [
+    "again",
+    "",
+    ""
+  ],
+  "vielleicht": [
+    "maybe",
+    "",
+    ""
+  ],
+  "natürlich": [
+    "of course",
+    "",
+    ""
+  ],
+  "wirklich": [
+    "really",
+    "",
+    ""
+  ],
+  "genau": [
+    "exactly",
+    "",
+    ""
+  ],
+  "bitte": [
+    "please | you're welcome",
+    "Bitte sprich langsam.",
+    "Please speak slowly."
+  ],
+  "danke": [
+    "thank you",
+    "Danke für deine Hilfe.",
+    "Thank you for your help."
+  ],
+  "gern": [
+    "gladly | like to",
+    "",
+    ""
+  ],
+  "gerne": [
+    "gladly | like to",
+    "",
+    ""
+  ],
+  "zusammen": [
+    "together",
+    "",
+    ""
+  ],
+  "allein": [
+    "alone",
+    "",
+    ""
+  ],
+  "etwas": [
+    "something | a little",
+    "",
+    ""
+  ],
+  "nichts": [
+    "nothing",
+    "",
+    ""
+  ],
+  "alles": [
+    "everything",
+    "",
+    ""
+  ],
+  "jemand": [
+    "someone",
+    "",
+    ""
+  ],
+  "niemand": [
+    "nobody",
+    "",
+    ""
+  ],
+  "jeder": [
+    "everyone | each",
+    "",
+    ""
+  ],
+  "alle": [
+    "all",
+    "",
+    ""
+  ],
+  "und": [
+    "and",
+    "",
+    ""
+  ],
+  "oder": [
+    "or",
+    "",
+    ""
+  ],
+  "aber": [
+    "but",
+    "",
+    ""
+  ],
+  "weil": [
+    "because",
+    "",
+    ""
+  ],
+  "denn": [
+    "because | then",
+    "",
+    ""
+  ],
+  "wenn": [
+    "if | when",
+    "",
+    ""
+  ],
+  "dass": [
+    "that",
+    "",
+    ""
+  ],
+  "mit": [
+    "with",
+    "",
+    ""
+  ],
+  "ohne": [
+    "without",
+    "",
+    ""
+  ],
+  "für": [
+    "for",
+    "",
+    ""
+  ],
+  "von": [
+    "from | of",
+    "",
+    ""
+  ],
+  "aus": [
+    "from | out of",
+    "",
+    ""
+  ],
+  "bei": [
+    "at | with",
+    "",
+    ""
+  ],
+  "zu": [
+    "to",
+    "",
+    ""
+  ],
+  "nach": [
+    "after | to",
+    "Nach der Arbeit gehe ich nach Hause.",
+    "After work, I go home."
+  ],
+  "vor": [
+    "before | in front of",
+    "",
+    ""
+  ],
+  "hinter": [
+    "behind",
+    "",
+    ""
+  ],
+  "über": [
+    "over | about",
+    "",
+    ""
+  ],
+  "unter": [
+    "under",
+    "",
+    ""
+  ],
+  "auf": [
+    "on",
+    "",
+    ""
+  ],
+  "an": [
+    "at | on",
+    "",
+    ""
+  ],
+  "in": [
+    "in",
+    "",
+    ""
+  ],
+  "neben": [
+    "next to",
+    "",
+    ""
+  ],
+  "zwischen": [
+    "between",
+    "",
+    ""
+  ],
+  "durch": [
+    "through",
+    "",
+    ""
+  ],
+  "gegen": [
+    "against | around",
+    "",
+    ""
+  ],
+  "um": [
+    "around | at",
+    "",
+    ""
+  ],
+  "bis": [
+    "until | to",
+    "",
+    ""
+  ],
+  "haben": [
+    "have",
+    "",
+    ""
+  ],
+  "machen": [
+    "do | make",
+    "",
+    ""
+  ],
+  "tun": [
+    "do",
+    "",
+    ""
+  ],
+  "gehen": [
+    "go",
+    "Ich gehe jetzt nach Hause.",
+    "I am going home now."
+  ],
+  "kommen": [
+    "come",
+    "",
+    ""
+  ],
+  "fahren": [
+    "drive | go",
+    "",
+    ""
+  ],
+  "laufen": [
+    "running",
+    "",
+    ""
+  ],
+  "rennen": [
+    "run",
+    "",
+    ""
+  ],
+  "bleiben": [
+    "stay",
+    "",
+    ""
+  ],
+  "wohnen": [
+    "live",
+    "",
+    ""
+  ],
+  "leben": [
+    "live",
+    "",
+    ""
+  ],
+  "arbeiten": [
+    "work",
+    "",
+    ""
+  ],
+  "lernen": [
+    "learn",
+    "Ich möchte Englisch lernen.",
+    "I want to learn English."
+  ],
+  "üben": [
+    "practice",
+    "",
+    ""
+  ],
+  "sprechen": [
+    "speak",
+    "Ich möchte besser Englisch sprechen.",
+    "I want to speak English better."
+  ],
+  "sagen": [
+    "say",
+    "",
+    ""
+  ],
+  "reden": [
+    "talk",
+    "",
+    ""
+  ],
+  "fragen": [
+    "ask",
+    "",
+    ""
+  ],
+  "antworten": [
+    "answer",
+    "",
+    ""
+  ],
+  "verstehen": [
+    "understand",
+    "",
+    ""
+  ],
+  "wissen": [
+    "know",
+    "",
+    ""
+  ],
+  "kennen": [
+    "know",
+    "",
+    ""
+  ],
+  "denken": [
+    "think",
+    "",
+    ""
+  ],
+  "glauben": [
+    "believe | think",
+    "",
+    ""
+  ],
+  "sehen": [
+    "see",
+    "",
+    ""
+  ],
+  "schauen": [
+    "look | watch",
+    "",
+    ""
+  ],
+  "hören": [
+    "hear | listen",
+    "",
+    ""
+  ],
+  "lesen": [
+    "read",
+    "",
+    ""
+  ],
+  "schreiben": [
+    "write",
+    "",
+    ""
+  ],
+  "buchstabieren": [
+    "spell",
+    "",
+    ""
+  ],
+  "öffnen": [
+    "open",
+    "",
+    ""
+  ],
+  "schließen": [
+    "close",
+    "",
+    ""
+  ],
+  "geben": [
+    "give",
+    "",
+    ""
+  ],
+  "nehmen": [
+    "take",
+    "",
+    ""
+  ],
+  "bringen": [
+    "bring",
+    "",
+    ""
+  ],
+  "holen": [
+    "get | fetch",
+    "",
+    ""
+  ],
+  "finden": [
+    "find",
+    "",
+    ""
+  ],
+  "suchen": [
+    "search | look for",
+    "",
+    ""
+  ],
+  "brauchen": [
+    "need",
+    "",
+    ""
+  ],
+  "wollen": [
+    "want",
+    "",
+    ""
+  ],
+  "möchten": [
+    "would like",
+    "",
+    ""
+  ],
+  "können": [
+    "can | be able to",
+    "",
+    ""
+  ],
+  "müssen": [
+    "must | have to",
+    "",
+    ""
+  ],
+  "dürfen": [
+    "may | be allowed to",
+    "",
+    ""
+  ],
+  "sollen": [
+    "should",
+    "",
+    ""
+  ],
+  "helfen": [
+    "help",
+    "",
+    ""
+  ],
+  "zeigen": [
+    "show",
+    "",
+    ""
+  ],
+  "erklären": [
+    "explain",
+    "",
+    ""
+  ],
+  "beginnen": [
+    "begin | start",
+    "",
+    ""
+  ],
+  "anfangen": [
+    "start",
+    "",
+    ""
+  ],
+  "enden": [
+    "end",
+    "",
+    ""
+  ],
+  "warten": [
+    "wait",
+    "",
+    ""
+  ],
+  "treffen": [
+    "meet",
+    "",
+    ""
+  ],
+  "besuchen": [
+    "visit",
+    "",
+    ""
+  ],
+  "anrufen": [
+    "call",
+    "",
+    ""
+  ],
+  "kaufen": [
+    "buy",
+    "",
+    ""
+  ],
+  "bezahlen": [
+    "pay",
+    "",
+    ""
+  ],
+  "kosten": [
+    "cost",
+    "",
+    ""
+  ],
+  "verkaufen": [
+    "sell",
+    "",
+    ""
+  ],
+  "bestellen": [
+    "order",
+    "",
+    ""
+  ],
+  "essen": [
+    "food | meal",
+    "",
+    ""
+  ],
+  "trinken": [
+    "drink",
+    "",
+    ""
+  ],
+  "kochen": [
+    "cook",
+    "",
+    ""
+  ],
+  "schlafen": [
+    "sleep",
+    "",
+    ""
+  ],
+  "aufstehen": [
+    "get up",
+    "",
+    ""
+  ],
+  "sitzen": [
+    "sit",
+    "",
+    ""
+  ],
+  "stehen": [
+    "stand",
+    "",
+    ""
+  ],
+  "liegen": [
+    "lie",
+    "",
+    ""
+  ],
+  "spielen": [
+    "play",
+    "",
+    ""
+  ],
+  "schwimmen": [
+    "swimming",
+    "",
+    ""
+  ],
+  "wandern": [
+    "hiking",
+    "",
+    ""
+  ],
+  "reisen": [
+    "travel",
+    "",
+    ""
+  ],
+  "fliegen": [
+    "fly",
+    "",
+    ""
+  ],
+  "tanzen": [
+    "dance",
+    "",
+    ""
+  ],
+  "singen": [
+    "sing",
+    "",
+    ""
+  ],
+  "lieben": [
+    "love",
+    "",
+    ""
+  ],
+  "mögen": [
+    "like",
+    "",
+    ""
+  ],
+  "tragen": [
+    "wear | carry",
+    "",
+    ""
+  ],
+  "anziehen": [
+    "put on",
+    "",
+    ""
+  ],
+  "waschen": [
+    "wash",
+    "",
+    ""
+  ],
+  "duschen": [
+    "shower",
+    "",
+    ""
+  ],
+  "putzen": [
+    "clean",
+    "",
+    ""
+  ],
+  "benutzen": [
+    "use",
+    "",
+    ""
+  ],
+  "verwenden": [
+    "use",
+    "",
+    ""
+  ],
+  "feiern": [
+    "celebrate",
+    "",
+    ""
+  ],
+  "regnen": [
+    "rain",
+    "",
+    ""
+  ],
+  "schneien": [
+    "snow",
+    "",
+    ""
+  ],
+  "gut": [
+    "good",
+    "",
+    ""
+  ],
+  "schlecht": [
+    "bad",
+    "",
+    ""
+  ],
+  "groß": [
+    "big | tall",
+    "",
+    ""
+  ],
+  "klein": [
+    "small",
+    "",
+    ""
+  ],
+  "lang": [
+    "long",
+    "",
+    ""
+  ],
+  "kurz": [
+    "short",
+    "",
+    ""
+  ],
+  "alt": [
+    "old",
+    "",
+    ""
+  ],
+  "jung": [
+    "young",
+    "",
+    ""
+  ],
+  "neu": [
+    "new",
+    "",
+    ""
+  ],
+  "schön": [
+    "beautiful | nice",
+    "",
+    ""
+  ],
+  "hässlich": [
+    "ugly",
+    "",
+    ""
+  ],
+  "leicht": [
+    "easy | light",
+    "",
+    ""
+  ],
+  "schwer": [
+    "difficult | heavy",
+    "",
+    ""
+  ],
+  "einfach": [
+    "easy | simple",
+    "",
+    ""
+  ],
+  "schnell": [
+    "fast",
+    "",
+    ""
+  ],
+  "langsam": [
+    "slow",
+    "",
+    ""
+  ],
+  "warm": [
+    "warm",
+    "",
+    ""
+  ],
+  "kalt": [
+    "cold",
+    "",
+    ""
+  ],
+  "heiß": [
+    "hot",
+    "",
+    ""
+  ],
+  "früh": [
+    "early",
+    "",
+    ""
+  ],
+  "spät": [
+    "late",
+    "",
+    ""
+  ],
+  "richtig": [
+    "right | correct",
+    "",
+    ""
+  ],
+  "falsch": [
+    "wrong",
+    "",
+    ""
+  ],
+  "wichtig": [
+    "important",
+    "",
+    ""
+  ],
+  "interessant": [
+    "interesting",
+    "",
+    ""
+  ],
+  "langweilig": [
+    "boring",
+    "",
+    ""
+  ],
+  "müde": [
+    "tired",
+    "",
+    ""
+  ],
+  "hungrig": [
+    "hungry",
+    "",
+    ""
+  ],
+  "durstig": [
+    "thirsty",
+    "",
+    ""
+  ],
+  "krank": [
+    "ill | sick",
+    "",
+    ""
+  ],
+  "gesund": [
+    "healthy",
+    "",
+    ""
+  ],
+  "glücklich": [
+    "happy",
+    "",
+    ""
+  ],
+  "traurig": [
+    "sad",
+    "",
+    ""
+  ],
+  "freundlich": [
+    "friendly",
+    "",
+    ""
+  ],
+  "nett": [
+    "nice",
+    "",
+    ""
+  ],
+  "laut": [
+    "loud",
+    "",
+    ""
+  ],
+  "leise": [
+    "quiet",
+    "",
+    ""
+  ],
+  "voll": [
+    "full",
+    "",
+    ""
+  ],
+  "leer": [
+    "empty",
+    "",
+    ""
+  ],
+  "offen": [
+    "open",
+    "",
+    ""
+  ],
+  "geschlossen": [
+    "closed",
+    "",
+    ""
+  ],
+  "teuer": [
+    "expensive",
+    "",
+    ""
+  ],
+  "billig": [
+    "cheap",
+    "",
+    ""
+  ],
+  "frei": [
+    "free",
+    "",
+    ""
+  ],
+  "besetzt": [
+    "occupied | busy",
+    "",
+    ""
+  ],
+  "nah": [
+    "near",
+    "",
+    ""
+  ],
+  "weit": [
+    "far",
+    "",
+    ""
+  ],
+  "links": [
+    "left",
+    "",
+    ""
+  ],
+  "rechts": [
+    "right",
+    "",
+    ""
+  ],
+  "geradeaus": [
+    "straight ahead",
+    "",
+    ""
+  ],
+  "null": [
+    "zero",
+    "",
+    ""
+  ],
+  "eins": [
+    "one",
+    "",
+    ""
+  ],
+  "zwei": [
+    "two",
+    "",
+    ""
+  ],
+  "drei": [
+    "three",
+    "",
+    ""
+  ],
+  "vier": [
+    "four",
+    "",
+    ""
+  ],
+  "fünf": [
+    "five",
+    "",
+    ""
+  ],
+  "sechs": [
+    "six",
+    "",
+    ""
+  ],
+  "sieben": [
+    "seven",
+    "",
+    ""
+  ],
+  "acht": [
+    "eight",
+    "",
+    ""
+  ],
+  "neun": [
+    "nine",
+    "",
+    ""
+  ],
+  "zehn": [
+    "ten",
+    "",
+    ""
+  ],
+  "elf": [
+    "eleven",
+    "",
+    ""
+  ],
+  "zwölf": [
+    "twelve",
+    "",
+    ""
+  ],
+  "dreizehn": [
+    "thirteen",
+    "",
+    ""
+  ],
+  "vierzehn": [
+    "fourteen",
+    "",
+    ""
+  ],
+  "fünfzehn": [
+    "fifteen",
+    "",
+    ""
+  ],
+  "sechzehn": [
+    "sixteen",
+    "",
+    ""
+  ],
+  "siebzehn": [
+    "seventeen",
+    "",
+    ""
+  ],
+  "achtzehn": [
+    "eighteen",
+    "",
+    ""
+  ],
+  "neunzehn": [
+    "nineteen",
+    "",
+    ""
+  ],
+  "zwanzig": [
+    "twenty",
+    "",
+    ""
+  ],
+  "dreißig": [
+    "thirty",
+    "",
+    ""
+  ],
+  "vierzig": [
+    "forty",
+    "",
+    ""
+  ],
+  "fünfzig": [
+    "fifty",
+    "",
+    ""
+  ],
+  "hundert": [
+    "hundred",
+    "",
+    ""
+  ],
+  "tausend": [
+    "thousand",
+    "",
+    ""
+  ],
+  "erste": [
+    "first",
+    "",
+    ""
+  ],
+  "zweite": [
+    "second",
+    "",
+    ""
+  ],
+  "dritte": [
+    "third",
+    "",
+    ""
+  ],
+  "zeit": [
+    "time",
+    "",
+    ""
+  ],
+  "uhr": [
+    "o'clock | clock",
+    "",
+    ""
+  ],
+  "stunde": [
+    "hour",
+    "",
+    ""
+  ],
+  "minute": [
+    "minute",
+    "",
+    ""
+  ],
+  "tag": [
+    "day",
+    "",
+    ""
+  ],
+  "woche": [
+    "week",
+    "",
+    ""
+  ],
+  "monat": [
+    "month",
+    "",
+    ""
+  ],
+  "jahr": [
+    "year",
+    "",
+    ""
+  ],
+  "wochenende": [
+    "weekend",
+    "",
+    ""
+  ],
+  "montag": [
+    "Monday",
+    "",
+    ""
+  ],
+  "dienstag": [
+    "Tuesday",
+    "",
+    ""
+  ],
+  "mittwoch": [
+    "Wednesday",
+    "",
+    ""
+  ],
+  "donnerstag": [
+    "Thursday",
+    "",
+    ""
+  ],
+  "freitag": [
+    "Friday",
+    "",
+    ""
+  ],
+  "samstag": [
+    "Saturday",
+    "",
+    ""
+  ],
+  "sonntag": [
+    "Sunday",
+    "",
+    ""
+  ],
+  "januar": [
+    "January",
+    "",
+    ""
+  ],
+  "februar": [
+    "February",
+    "",
+    ""
+  ],
+  "märz": [
+    "March",
+    "",
+    ""
+  ],
+  "april": [
+    "April",
+    "",
+    ""
+  ],
+  "mai": [
+    "May",
+    "",
+    ""
+  ],
+  "juni": [
+    "June",
+    "",
+    ""
+  ],
+  "juli": [
+    "July",
+    "",
+    ""
+  ],
+  "august": [
+    "August",
+    "",
+    ""
+  ],
+  "september": [
+    "September",
+    "",
+    ""
+  ],
+  "oktober": [
+    "October",
+    "",
+    ""
+  ],
+  "november": [
+    "November",
+    "",
+    ""
+  ],
+  "dezember": [
+    "December",
+    "",
+    ""
+  ],
+  "mensch": [
+    "person",
+    "",
+    ""
+  ],
+  "mann": [
+    "man",
+    "",
+    ""
+  ],
+  "frau": [
+    "woman | wife",
+    "",
+    ""
+  ],
+  "kind": [
+    "child",
+    "",
+    ""
+  ],
+  "junge": [
+    "boy",
+    "",
+    ""
+  ],
+  "mädchen": [
+    "girl",
+    "",
+    ""
+  ],
+  "freund": [
+    "friend | boyfriend",
+    "Er ist mein Freund.",
+    "He is my friend."
+  ],
+  "freundin": [
+    "friend | girlfriend",
+    "",
+    ""
+  ],
+  "familie": [
+    "family",
+    "",
+    ""
+  ],
+  "eltern": [
+    "parents",
+    "",
+    ""
+  ],
+  "mutter": [
+    "mother",
+    "",
+    ""
+  ],
+  "vater": [
+    "father",
+    "",
+    ""
+  ],
+  "mama": [
+    "mum",
+    "",
+    ""
+  ],
+  "papa": [
+    "dad",
+    "",
+    ""
+  ],
+  "bruder": [
+    "brother",
+    "",
+    ""
+  ],
+  "schwester": [
+    "sister",
+    "",
+    ""
+  ],
+  "sohn": [
+    "son",
+    "",
+    ""
+  ],
+  "tochter": [
+    "daughter",
+    "",
+    ""
+  ],
+  "ehemann": [
+    "husband",
+    "",
+    ""
+  ],
+  "ehefrau": [
+    "wife",
+    "",
+    ""
+  ],
+  "oma": [
+    "grandmother",
+    "",
+    ""
+  ],
+  "opa": [
+    "grandfather",
+    "",
+    ""
+  ],
+  "name": [
+    "name",
+    "",
+    ""
+  ],
+  "vorname": [
+    "first name",
+    "",
+    ""
+  ],
+  "nachname": [
+    "last name",
+    "",
+    ""
+  ],
+  "alter": [
+    "age",
+    "",
+    ""
+  ],
+  "haus": [
+    "house",
+    "Das ist mein Haus.",
+    "This is my house."
+  ],
+  "wohnung": [
+    "flat | apartment",
+    "",
+    ""
+  ],
+  "zimmer": [
+    "room",
+    "",
+    ""
+  ],
+  "küche": [
+    "kitchen",
+    "",
+    ""
+  ],
+  "bad": [
+    "bathroom",
+    "",
+    ""
+  ],
+  "schlafzimmer": [
+    "bedroom",
+    "",
+    ""
+  ],
+  "wohnzimmer": [
+    "living room",
+    "",
+    ""
+  ],
+  "tür": [
+    "door",
+    "",
+    ""
+  ],
+  "fenster": [
+    "window",
+    "",
+    ""
+  ],
+  "tisch": [
+    "table",
+    "",
+    ""
+  ],
+  "stuhl": [
+    "chair",
+    "",
+    ""
+  ],
+  "bett": [
+    "bed",
+    "",
+    ""
+  ],
+  "sofa": [
+    "sofa",
+    "",
+    ""
+  ],
+  "lampe": [
+    "lamp",
+    "",
+    ""
+  ],
+  "schlüssel": [
+    "key",
+    "",
+    ""
+  ],
+  "garten": [
+    "garden",
+    "",
+    ""
+  ],
+  "getränk": [
+    "drink",
+    "",
+    ""
+  ],
+  "wasser": [
+    "water",
+    "Ich trinke Wasser.",
+    "I drink water."
+  ],
+  "kaffee": [
+    "coffee",
+    "",
+    ""
+  ],
+  "tee": [
+    "tea",
+    "",
+    ""
+  ],
+  "milch": [
+    "milk",
+    "",
+    ""
+  ],
+  "saft": [
+    "juice",
+    "",
+    ""
+  ],
+  "brot": [
+    "bread",
+    "",
+    ""
+  ],
+  "brötchen": [
+    "bread roll",
+    "",
+    ""
+  ],
+  "butter": [
+    "butter",
+    "",
+    ""
+  ],
+  "käse": [
+    "cheese",
+    "",
+    ""
+  ],
+  "ei": [
+    "egg",
+    "",
+    ""
+  ],
+  "fleisch": [
+    "meat",
+    "",
+    ""
+  ],
+  "fisch": [
+    "fish",
+    "",
+    ""
+  ],
+  "huhn": [
+    "chicken",
+    "",
+    ""
+  ],
+  "reis": [
+    "rice",
+    "",
+    ""
+  ],
+  "nudeln": [
+    "pasta",
+    "",
+    ""
+  ],
+  "kartoffel": [
+    "potato",
+    "",
+    ""
+  ],
+  "suppe": [
+    "soup",
+    "",
+    ""
+  ],
+  "salat": [
+    "salad",
+    "",
+    ""
+  ],
+  "gemüse": [
+    "vegetables",
+    "",
+    ""
+  ],
+  "obst": [
+    "fruit",
+    "",
+    ""
+  ],
+  "apfel": [
+    "apple",
+    "",
+    ""
+  ],
+  "orange": [
+    "orange",
+    "",
+    ""
+  ],
+  "banane": [
+    "banana",
+    "",
+    ""
+  ],
+  "tomate": [
+    "tomato",
+    "",
+    ""
+  ],
+  "zwiebel": [
+    "onion",
+    "",
+    ""
+  ],
+  "zucker": [
+    "sugar",
+    "",
+    ""
+  ],
+  "salz": [
+    "salt",
+    "",
+    ""
+  ],
+  "kuchen": [
+    "cake",
+    "",
+    ""
+  ],
+  "frühstück": [
+    "breakfast",
+    "",
+    ""
+  ],
+  "mittagessen": [
+    "lunch",
+    "",
+    ""
+  ],
+  "abendessen": [
+    "dinner",
+    "",
+    ""
+  ],
+  "restaurant": [
+    "restaurant",
+    "",
+    ""
+  ],
+  "rechnung": [
+    "bill",
+    "",
+    ""
+  ],
+  "stadt": [
+    "city",
+    "",
+    ""
+  ],
+  "dorf": [
+    "village",
+    "",
+    ""
+  ],
+  "straße": [
+    "street",
+    "",
+    ""
+  ],
+  "weg": [
+    "way | path",
+    "",
+    ""
+  ],
+  "platz": [
+    "square | place",
+    "",
+    ""
+  ],
+  "bahnhof": [
+    "train station",
+    "",
+    ""
+  ],
+  "haltestelle": [
+    "stop",
+    "",
+    ""
+  ],
+  "flughafen": [
+    "airport",
+    "",
+    ""
+  ],
+  "hotel": [
+    "hotel",
+    "",
+    ""
+  ],
+  "geschäft": [
+    "shop",
+    "",
+    ""
+  ],
+  "laden": [
+    "shop",
+    "",
+    ""
+  ],
+  "supermarkt": [
+    "supermarket",
+    "",
+    ""
+  ],
+  "bank": [
+    "bank",
+    "",
+    ""
+  ],
+  "post": [
+    "post office",
+    "",
+    ""
+  ],
+  "apotheke": [
+    "pharmacy",
+    "",
+    ""
+  ],
+  "krankenhaus": [
+    "hospital",
+    "",
+    ""
+  ],
+  "schule": [
+    "school",
+    "",
+    ""
+  ],
+  "büro": [
+    "office",
+    "",
+    ""
+  ],
+  "toilette": [
+    "toilet",
+    "",
+    ""
+  ],
+  "strand": [
+    "beach",
+    "Ich gehe heute zum Strand.",
+    "I am going to the beach today."
+  ],
+  "meer": [
+    "sea",
+    "Das Meer ist ruhig.",
+    "The sea is calm."
+  ],
+  "see": [
+    "lake",
+    "Ich bin heute am See.",
+    "I am at the lake today."
+  ],
+  "berg": [
+    "mountain",
+    "",
+    ""
+  ],
+  "wald": [
+    "forest",
+    "",
+    ""
+  ],
+  "park": [
+    "park",
+    "",
+    ""
+  ],
+  "land": [
+    "country",
+    "",
+    ""
+  ],
+  "deutschland": [
+    "Germany",
+    "",
+    ""
+  ],
+  "england": [
+    "England",
+    "",
+    ""
+  ],
+  "urlaub": [
+    "holiday",
+    "",
+    ""
+  ],
+  "reise": [
+    "trip | journey",
+    "",
+    ""
+  ],
+  "ticket": [
+    "ticket",
+    "",
+    ""
+  ],
+  "fahrkarte": [
+    "ticket",
+    "",
+    ""
+  ],
+  "koffer": [
+    "suitcase",
+    "",
+    ""
+  ],
+  "tasche": [
+    "bag",
+    "",
+    ""
+  ],
+  "pass": [
+    "passport",
+    "",
+    ""
+  ],
+  "karte": [
+    "map | card",
+    "",
+    ""
+  ],
+  "auto": [
+    "car",
+    "",
+    ""
+  ],
+  "bus": [
+    "bus",
+    "",
+    ""
+  ],
+  "zug": [
+    "train",
+    "",
+    ""
+  ],
+  "fahrrad": [
+    "bike",
+    "",
+    ""
+  ],
+  "flugzeug": [
+    "plane",
+    "",
+    ""
+  ],
+  "schiff": [
+    "ship",
+    "",
+    ""
+  ],
+  "taxi": [
+    "taxi",
+    "",
+    ""
+  ],
+  "wetter": [
+    "weather",
+    "",
+    ""
+  ],
+  "sonne": [
+    "sun",
+    "",
+    ""
+  ],
+  "regen": [
+    "rain",
+    "",
+    ""
+  ],
+  "schnee": [
+    "snow",
+    "",
+    ""
+  ],
+  "wind": [
+    "wind",
+    "Heute gibt es viel Wind.",
+    "There is a lot of wind today."
+  ],
+  "wolke": [
+    "cloud",
+    "",
+    ""
+  ],
+  "himmel": [
+    "sky",
+    "",
+    ""
+  ],
+  "feuer": [
+    "fire",
+    "",
+    ""
+  ],
+  "stein": [
+    "stone",
+    "",
+    ""
+  ],
+  "baum": [
+    "tree",
+    "",
+    ""
+  ],
+  "blume": [
+    "flower",
+    "",
+    ""
+  ],
+  "kopf": [
+    "head",
+    "",
+    ""
+  ],
+  "haar": [
+    "hair",
+    "",
+    ""
+  ],
+  "auge": [
+    "eye",
+    "",
+    ""
+  ],
+  "ohr": [
+    "ear",
+    "",
+    ""
+  ],
+  "nase": [
+    "nose",
+    "",
+    ""
+  ],
+  "mund": [
+    "mouth",
+    "",
+    ""
+  ],
+  "hand": [
+    "hand",
+    "",
+    ""
+  ],
+  "arm": [
+    "arm",
+    "",
+    ""
+  ],
+  "bein": [
+    "leg",
+    "",
+    ""
+  ],
+  "fuß": [
+    "foot",
+    "",
+    ""
+  ],
+  "körper": [
+    "body",
+    "",
+    ""
+  ],
+  "hemd": [
+    "shirt",
+    "",
+    ""
+  ],
+  "hose": [
+    "trousers | pants",
+    "",
+    ""
+  ],
+  "jacke": [
+    "jacket",
+    "",
+    ""
+  ],
+  "schuh": [
+    "shoe",
+    "",
+    ""
+  ],
+  "kleid": [
+    "dress",
+    "",
+    ""
+  ],
+  "mütze": [
+    "hat",
+    "",
+    ""
+  ],
+  "farbe": [
+    "colour",
+    "",
+    ""
+  ],
+  "rot": [
+    "red",
+    "",
+    ""
+  ],
+  "blau": [
+    "blue",
+    "",
+    ""
+  ],
+  "grün": [
+    "green",
+    "",
+    ""
+  ],
+  "gelb": [
+    "yellow",
+    "",
+    ""
+  ],
+  "schwarz": [
+    "black",
+    "",
+    ""
+  ],
+  "weiß": [
+    "white",
+    "",
+    ""
+  ],
+  "grau": [
+    "grey",
+    "",
+    ""
+  ],
+  "braun": [
+    "brown",
+    "",
+    ""
+  ],
+  "arbeit": [
+    "work",
+    "Ich gehe heute zur Arbeit.",
+    "I am going to work today."
+  ],
+  "beruf": [
+    "job | profession",
+    "",
+    ""
+  ],
+  "firma": [
+    "company",
+    "",
+    ""
+  ],
+  "chef": [
+    "boss",
+    "",
+    ""
+  ],
+  "kollege": [
+    "colleague",
+    "",
+    ""
+  ],
+  "computer": [
+    "computer",
+    "",
+    ""
+  ],
+  "handy": [
+    "mobile phone",
+    "",
+    ""
+  ],
+  "telefon": [
+    "telephone",
+    "",
+    ""
+  ],
+  "internet": [
+    "internet",
+    "",
+    ""
+  ],
+  "email": [
+    "email",
+    "",
+    ""
+  ],
+  "buch": [
+    "book",
+    "",
+    ""
+  ],
+  "wort": [
+    "word",
+    "",
+    ""
+  ],
+  "satz": [
+    "sentence",
+    "",
+    ""
+  ],
+  "frage": [
+    "question",
+    "",
+    ""
+  ],
+  "antwort": [
+    "answer",
+    "",
+    ""
+  ],
+  "sprache": [
+    "language",
+    "",
+    ""
+  ],
+  "englisch": [
+    "English",
+    "",
+    ""
+  ],
+  "deutsch": [
+    "German",
+    "",
+    ""
+  ],
+  "kurs": [
+    "course",
+    "",
+    ""
+  ],
+  "sport": [
+    "sport",
+    "",
+    ""
+  ],
+  "fußball": [
+    "football",
+    "",
+    ""
+  ],
+  "musik": [
+    "music",
+    "",
+    ""
+  ],
+  "film": [
+    "film | movie",
+    "",
+    ""
+  ],
+  "fernsehen": [
+    "television",
+    "",
+    ""
+  ],
+  "spiel": [
+    "game",
+    "",
+    ""
+  ],
+  "windsurfen": [
+    "windsurfing",
+    "Ich gehe heute windsurfen.",
+    "I am going windsurfing today."
+  ],
+  "segel": [
+    "sail",
+    "",
+    ""
+  ],
+  "brett": [
+    "board",
+    "",
+    ""
+  ],
+  "wing": [
+    "wing",
+    "",
+    ""
+  ],
+  "guten morgen": [
+    "good morning",
+    "",
+    ""
+  ],
+  "guten tag": [
+    "good afternoon | hello",
+    "",
+    ""
+  ],
+  "guten abend": [
+    "good evening",
+    "",
+    ""
+  ],
+  "gute nacht": [
+    "good night",
+    "",
+    ""
+  ],
+  "auf wiedersehen": [
+    "goodbye",
+    "",
+    ""
+  ],
+  "bis bald": [
+    "see you soon",
+    "",
+    ""
+  ],
+  "bis morgen": [
+    "see you tomorrow",
+    "",
+    ""
+  ],
+  "entschuldigung": [
+    "excuse me | sorry",
+    "",
+    ""
+  ],
+  "tut mir leid": [
+    "I'm sorry",
+    "",
+    ""
+  ],
+  "wie geht es dir": [
+    "how are you",
+    "",
+    ""
+  ],
+  "mir geht es gut": [
+    "I'm fine",
+    "",
+    ""
+  ],
+  "ich weiß nicht": [
+    "I don't know",
+    "",
+    ""
+  ],
+  "ich verstehe nicht": [
+    "I don't understand",
+    "",
+    ""
+  ],
+  "noch einmal": [
+    "again",
+    "",
+    ""
+  ],
+  "bitte langsam": [
+    "slowly, please",
+    "",
+    ""
+  ],
+  "was kostet das": [
+    "how much is that",
+    "",
+    ""
+  ],
+  "wo ist": [
+    "where is",
+    "",
+    ""
+  ],
+  "ich möchte": [
+    "I would like",
+    "",
+    ""
+  ],
+  "ich brauche": [
+    "I need",
+    "",
+    ""
+  ],
+  "hallo": [
+    "hello",
+    "Hallo, wie geht es dir?",
+    "Hello, how are you?"
+  ]
 };
 
 function openDB(){return new Promise((res,rej)=>{
@@ -190,7 +2684,67 @@ async function nextSent(){const a=await all(),d=a.filter(hasSentence);document.g
 async function check(kind){let c,aId,rId,mId,exp;if(kind==="today"){c=todayCur;aId="todayA";rId="todayR";mId="todayManual";exp=c?.englisch}if(kind==="mist"){c=mistCur;aId="mistA";rId="mistR";mId="mistManual";exp=c?.englisch}if(kind==="sent"){c=sentCur;aId="sentA";rId="sentR";mId="sentManual";exp=c?pair(c).en:null}if(!c)return;const ans=document.getElementById(aId).value.trim();if(!ans){show(rId,"Bitte zuerst antworten.","warn");return}const b=best(ans,exp);if(b.score>=.9){await right(c);show(rId,"✅ RICHTIG","good");document.getElementById(mId).classList.add("hidden")}else{await wrong(c);show(rId,b.score>=.72?`🟡 FAST RICHTIG\nRichtig: ${b.text}`:`❌ NOCH NICHT RICHTIG\nRichtig: ${b.text}`,b.score>=.72?"warn":"bad");document.getElementById(mId).classList.remove("hidden");if(kind==="today")todayWrong=true;if(kind==="mist")mistWrong=true;if(kind==="sent")sentWrong=true}await refresh()}
 async function manual(kind){let c,w,r,m;if(kind==="today"){c=todayCur;w=todayWrong;r="todayR";m="todayManual";todayWrong=false}if(kind==="mist"){c=mistCur;w=mistWrong;r="mistR";m="mistManual";mistWrong=false}if(kind==="sent"){c=sentCur;w=sentWrong;r="sentR";m="sentManual";sentWrong=false}if(!c)return;await right(c,w);show(r,"✅ ALS RICHTIG MARKIERT","good");document.getElementById(m).classList.add("hidden");await refresh()}
 
-function suggest(){const key=document.getElementById("german").value.toLowerCase().trim().replace(/[.!?,;:]/g,""),x=DICT[key],box=document.getElementById("suggest");if(!x){box.classList.remove("show");return}box.classList.add("show");document.getElementById("suggestText").textContent=`${x[0]} · Beispiel: ${x[2]}`;if(!document.getElementById("english").value)document.getElementById("english").value=x[0];if(!document.getElementById("sentenceDe").value)document.getElementById("sentenceDe").value=x[1];if(!document.getElementById("sentenceEn").value)document.getElementById("sentenceEn").value=x[2]}
+function cleanGermanKey(t){
+  return String(t||"").toLowerCase().trim().replace(/[.!?,;:]/g,"").replace(/\s+/g," ");
+}
+function applySuggestion(key){
+  const x=DICT[key];
+  if(!x)return;
+  document.getElementById("german").value=key;
+  document.getElementById("english").value=x[0]||"";
+  if(x[1])document.getElementById("sentenceDe").value=x[1];
+  if(x[2])document.getElementById("sentenceEn").value=x[2];
+  document.getElementById("suggest").classList.add("show");
+  document.getElementById("suggestText").textContent=`${x[0]} · lokal gespeichert`;
+}
+function suggest(){
+  const input=document.getElementById("german");
+  const key=cleanGermanKey(input.value);
+  const box=document.getElementById("suggest");
+  const text=document.getElementById("suggestText");
+  const list=document.getElementById("suggestList");
+  list.innerHTML="";
+  if(!key){
+    box.classList.remove("show");
+    return;
+  }
+
+  const exact=DICT[key];
+  let matches=Object.keys(DICT)
+    .filter(k=>k.startsWith(key))
+    .sort((a,b)=>a.length-b.length||a.localeCompare(b,"de"))
+    .slice(0,8);
+
+  if(!matches.length && key.length>=3){
+    matches=Object.keys(DICT)
+      .filter(k=>k.includes(key))
+      .sort((a,b)=>a.length-b.length||a.localeCompare(b,"de"))
+      .slice(0,8);
+  }
+
+  if(exact){
+    box.classList.add("show");
+    text.textContent=`${exact[0]} · A1-Grundwortschatz lokal`;
+    if(!document.getElementById("english").value)document.getElementById("english").value=exact[0];
+    if(exact[1]&&!document.getElementById("sentenceDe").value)document.getElementById("sentenceDe").value=exact[1];
+    if(exact[2]&&!document.getElementById("sentenceEn").value)document.getElementById("sentenceEn").value=exact[2];
+  }else if(matches.length){
+    box.classList.add("show");
+    text.textContent="Tippe auf einen Vorschlag:";
+  }else{
+    box.classList.remove("show");
+    return;
+  }
+
+  for(const k of matches){
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="suggest-btn";
+    b.textContent=`${k} → ${DICT[k][0]}`;
+    b.onclick=()=>applySuggestion(k);
+    list.appendChild(b);
+  }
+}
 async function save(){const de=document.getElementById("german").value.trim(),en=document.getElementById("english").value.trim(),sd=document.getElementById("sentenceDe").value.trim(),se=document.getElementById("sentenceEn").value.trim();if(!de||!en){document.getElementById("saveStatus").textContent="Bitte Deutsch und Englisch eingeben.";return}await add({deutsch:de,englisch:en,satzDeutsch:sd,satzEnglisch:se,richtig:0,falsch:0,serie:0,letzteWiederholung:null,naechsteWiederholung:null});["german","english","sentenceDe","sentenceEn"].forEach(i=>document.getElementById(i).value="");document.getElementById("suggest").classList.remove("show");document.getElementById("saveStatus").textContent="✅ Gespeichert";await refresh();await nextToday()}
 async function renderList(){const a=await all(),q=document.getElementById("search").value.toLowerCase().trim(),list=document.getElementById("list");list.innerHTML="";for(const e of a.filter(e=>!q||String(e.deutsch||"").toLowerCase().includes(q)||String(e.englisch||"").toLowerCase().includes(q)).sort((a,b)=>b.id-a.id)){const p=hasSentence(e)?pair(e):null,d=document.createElement("div");d.className="item";let badge=hard(e)?'<span class="badge hard">⚠ schwierig</span>':learned(e)?'<span class="badge learned">✓ gut gelernt</span>':due(e)?'<span class="badge due">heute fällig</span>':"";d.innerHTML=`<div class="de"></div><div class="en"></div>${p?'<div class="sentence"></div>':""}${badge}<div class="meta"></div><div class="actions"><button class="lw">🔊 Wort</button>${p?'<button class="ls">🔊 Satz</button>':""}<button class="reset">↩ Reset</button><button class="del bad">🗑</button></div>`;d.querySelector(".de").textContent=e.deutsch;d.querySelector(".en").textContent=vars(e.englisch)[0];if(p)d.querySelector(".sentence").textContent=`Satz: ${p.en}`;d.querySelector(".meta").textContent=`Richtig ${e.richtig||0} · Falsch ${e.falsch||0} · Serie ${e.serie||0}`;d.querySelector(".lw").onclick=()=>speak(vars(e.englisch)[0]);if(p)d.querySelector(".ls").onclick=()=>speak(vars(p.en)[0]);d.querySelector(".reset").onclick=async()=>{e.richtig=0;e.falsch=0;e.serie=0;e.letzteWiederholung=null;e.naechsteWiederholung=null;await put(e);await refresh()};d.querySelector(".del").onclick=async()=>{if(confirm("Diesen Eintrag löschen?")){await del(e.id);await refresh()}};list.appendChild(d)}}
 async function stats(){const a=await all();document.getElementById("sTotal").textContent=a.length;document.getElementById("sDue").textContent=a.filter(due).length;document.getElementById("sHard").textContent=a.filter(hard).length;document.getElementById("sLearned").textContent=a.filter(learned).length;document.getElementById("sRight").textContent=a.reduce((s,e)=>s+(e.richtig||0),0);document.getElementById("sWrong").textContent=a.reduce((s,e)=>s+(e.falsch||0),0)}
@@ -229,6 +2783,6 @@ for(const event of ["onclick","oninput","onchange"]){const handler=el[event];if(
 }
 // Tabs themselves remain usable even when storage cannot be opened.
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===b.dataset.tab));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));ready.then(()=>tab(b.dataset.tab)).catch(reportError)});
-try{await ready;await nextToday();await refresh();status("Version 2.2 · Lerninhalte geladen")}catch(error){reportError(error);document.getElementById("todayQ").textContent="Bitte den Hinweis oben beachten."}
+try{await ready;await nextToday();await refresh();status("Version 2.3 · Lerninhalte geladen")}catch(error){reportError(error);document.getElementById("todayQ").textContent="Bitte den Hinweis oben beachten."}
 });
 </script></body></html>
