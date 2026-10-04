@@ -13,20 +13,20 @@
 :root{--bg:#08101f;--card:#111827;--card2:#172033;--text:#f8fafc;--muted:#a8b1c2;--line:#2b3852;--blue:#2563eb;--green:#15803d;--orange:#a16207;--red:#b91c1c}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:14px;min-height:100vh}.app{max-width:760px;margin:auto}
 h1{font-size:1.6rem;margin:4px 0}.sub{color:var(--muted);margin:0 0 10px}.privacy{background:#0f172a;border:1px solid #1d4ed8;border-radius:14px;padding:10px;color:#dbeafe;font-size:.9rem}
-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:10px 0;position:sticky;top:0;background:linear-gradient(var(--bg) 80%,transparent);padding:7px 0;z-index:5}
+nav{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:10px 0;position:sticky;top:0;background:linear-gradient(var(--bg) 80%,transparent);padding:7px 0;z-index:5}
 button,input,textarea{font:inherit}button{border:0;border-radius:13px;padding:11px 8px;font-weight:700;background:#26334c;color:white;min-height:44px}button.primary{background:var(--blue)}button.good{background:var(--green)}button.warn{background:var(--orange)}button.bad{background:var(--red)}button.ghost{background:transparent;border:1px solid var(--line)}
 .nav{font-size:.82rem;padding:8px 3px}.nav.active{background:var(--blue)}.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0}
 .q{font-size:1.45rem;font-weight:800;text-align:center;min-height:84px;display:flex;align-items:center;justify-content:center;line-height:1.35}.hint{text-align:center;color:var(--muted)}.counter{text-align:center;color:#bfdbfe;font-weight:700;margin:5px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:560px){.grid2{grid-template-columns:1fr}.nav span{display:block;font-size:1.1rem}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:560px){.grid2{grid-template-columns:1fr}nav{grid-template-columns:repeat(3,1fr)}.nav span{display:block;font-size:1.1rem}}
 label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,textarea{width:100%;background:#0f172a;color:white;border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}textarea{min-height:74px}.ans{font-size:1.15rem}
 .result{display:none;margin-top:10px;padding:12px;border-radius:13px;text-align:center;font-weight:800;white-space:pre-line}.result.good{display:block;background:rgba(21,128,61,.2)}.result.warn{display:block;background:rgba(161,98,7,.2)}.result.bad{display:block;background:rgba(185,28,28,.2)}
 .hidden{display:none!important}.small{font-size:.88rem;color:var(--muted);line-height:1.4}.item{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:11px;margin:8px 0}.item .de{font-weight:800}.item .en{color:#bfdbfe;margin-top:3px}.item .sentence{font-size:.9rem;color:#cbd5e1;margin-top:6px}.meta{font-size:.82rem;color:var(--muted);margin-top:6px}.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.actions button{flex:1;min-height:38px;padding:7px}
 .suggest{display:none;background:#10213b;border:1px solid #2563eb;border-radius:12px;padding:10px;margin-top:8px}.suggest.show{display:block}.suggest-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.suggest-btn{min-height:34px;padding:6px 9px;border:1px solid #3b82f6;background:#172554;font-size:.88rem}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}.stat b{display:block;font-size:1.7rem;margin-top:4px}
-.badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:.75rem;margin-top:6px}.hard{background:#7f1d1d;color:#fecaca}.due{background:#713f12;color:#fde68a}.learned{background:#14532d;color:#bbf7d0}
+.badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:.75rem;margin-top:6px}.hard{background:#7f1d1d;color:#fecaca}.due{background:#713f12;color:#fde68a}.learned{background:#14532d;color:#bbf7d0}.coachbox{background:#0f172a;border:1px solid #334155;border-radius:16px;padding:14px;margin:10px 0}.coachq{font-size:1.35rem;font-weight:800;line-height:1.35;text-align:center;padding:12px}.coachhint{display:none;background:#172033;border:1px dashed #64748b;border-radius:12px;padding:10px;margin-top:8px}.coachhint.show{display:block}.topic{margin-bottom:8px}.session{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#bfdbfe;font-weight:700}.coachresult{margin-top:10px}.tiny{font-size:.8rem;color:var(--muted)}
 </style>
 </head>
 <body><div class="app">
-<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Version 2.3 · privat · lokal auf deinem iPhone</p>
+<h1>🇬🇧 Mein Englisch-Trainer</h1><p class="sub">Version 2.4 · privat · lokal auf deinem iPhone</p>
 <div class="privacy">🔒 Deine Wörter, Sätze und dein Lernstand bleiben auf deinem Gerät.</div>
 
 <div id="appStatus" role="status" class="privacy">Lerninhalte werden geladen …</div>
@@ -34,6 +34,7 @@ label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,t
 <button class="nav active" data-tab="today"><span>🎯</span>Heute</button>
 <button class="nav" data-tab="mistakes"><span>🔁</span>Fehler</button>
 <button class="nav" data-tab="sentences"><span>🗣</span>Sätze</button>
+<button class="nav" data-tab="conversation"><span>💬</span>Sprechen</button>
 <button class="nav" data-tab="add"><span>➕</span>Neu</button>
 <button class="nav" data-tab="progress"><span>📊</span>Stand</button>
 </nav>
@@ -61,6 +62,27 @@ label{display:block;color:var(--muted);font-weight:700;margin:10px 0 5px}input,t
 <button id="sentCheck" class="good" style="width:100%;margin-top:8px">✅ Satz prüfen</button><div id="sentR" class="result"></div>
 <button id="sentManual" class="warn hidden" style="width:100%;margin-top:8px">✅ Ich hatte den Satz richtig</button>
 </div></section>
+
+
+<section id="conversation" class="panel">
+<div class="card"><h2>💬 Englisch sprechen</h2>
+<p class="small">Die App stellt dir englische A1-Fragen. Antworte mit einem ganzen englischen Satz. Du kannst dafür auch das Mikrofon der iPhone-Tastatur benutzen.</p>
+<label>Thema</label>
+<select id="coachTopic" class="topic" style="width:100%;background:#0f172a;color:white;border:1px solid var(--line);border-radius:12px;padding:12px"></select>
+<div class="coachbox">
+<div class="session"><span id="coachCount">Frage 1 von 10</span><span id="coachScore">0 richtig · 0 üben</span></div>
+<div id="coachQ" class="coachq"></div>
+<div class="grid2"><button id="coachListen">🔊 Frage anhören</button><button id="coachSlow">🐢 Langsam anhören</button></div>
+<button id="coachHelp" class="ghost" style="width:100%;margin-top:8px">💡 Hilfe</button>
+<div id="coachHint" class="coachhint"></div>
+<label>Deine Antwort auf Englisch</label>
+<input id="coachA" class="ans" placeholder="z. B. My name is Mark." autocapitalize="off">
+<p class="tiny">Tipp: Ganze Sätze sind wichtiger als perfekte Grammatik.</p>
+<button id="coachCheck" class="good" style="width:100%">✅ Antwort prüfen</button>
+<div id="coachR" class="result coachresult"></div>
+<button id="coachNext" class="primary" style="width:100%;margin-top:8px">➡ Nächste Frage</button>
+</div></div>
+</section>
 
 <section id="add" class="panel">
 <div class="card"><h2>➕ Wort oder Satz hinzufügen</h2>
@@ -2642,6 +2664,756 @@ const DICT={
   ]
 };
 
+const CONVERSATIONS={
+  "Kennenlernen": [
+    {
+      "q": "What is your name?",
+      "hint": "Beginne mit: My name is ... / I am ...",
+      "example": "My name is Mark.",
+      "accept": [
+        "my name is",
+        "i am"
+      ]
+    },
+    {
+      "q": "Where do you live?",
+      "hint": "Beginne mit: I live in ...",
+      "example": "I live in Heilbronn.",
+      "accept": [
+        "i live in"
+      ]
+    },
+    {
+      "q": "How old are you?",
+      "hint": "Beginne mit: I am ... years old.",
+      "example": "I am fifty-three years old.",
+      "accept": [
+        "i am"
+      ]
+    },
+    {
+      "q": "Are you married?",
+      "hint": "Antworte mit: Yes, I am. / No, I am not.",
+      "example": "Yes, I am.",
+      "accept": [
+        "yes i am",
+        "no i am not",
+        "no im not"
+      ]
+    },
+    {
+      "q": "What do you like to do?",
+      "hint": "Beginne mit: I like ...",
+      "example": "I like windsurfing and hiking.",
+      "accept": [
+        "i like",
+        "i love"
+      ]
+    },
+    {
+      "q": "Do you have a hobby?",
+      "hint": "Beginne mit: Yes, I ... / My hobby is ...",
+      "example": "Yes, I like windsurfing.",
+      "accept": [
+        "yes i",
+        "my hobby is",
+        "i like"
+      ]
+    },
+    {
+      "q": "What is your favourite sport?",
+      "hint": "Beginne mit: My favourite sport is ...",
+      "example": "My favourite sport is windsurfing.",
+      "accept": [
+        "my favourite sport is",
+        "my favorite sport is",
+        "i like"
+      ]
+    },
+    {
+      "q": "What languages do you speak?",
+      "hint": "Beginne mit: I speak ...",
+      "example": "I speak German and a little English.",
+      "accept": [
+        "i speak"
+      ]
+    },
+    {
+      "q": "Why do you learn English?",
+      "hint": "Beginne mit: I learn English because ...",
+      "example": "I learn English because I want to travel.",
+      "accept": [
+        "i learn english because",
+        "because i"
+      ]
+    },
+    {
+      "q": "How are you today?",
+      "hint": "Beginne mit: I am ... / I feel ...",
+      "example": "I am fine today.",
+      "accept": [
+        "i am",
+        "i feel",
+        "im"
+      ]
+    }
+  ],
+  "Alltag": [
+    {
+      "q": "What time do you get up?",
+      "hint": "Beginne mit: I get up at ...",
+      "example": "I get up at seven o'clock.",
+      "accept": [
+        "i get up"
+      ]
+    },
+    {
+      "q": "What do you eat for breakfast?",
+      "hint": "Beginne mit: I eat ... / I have ...",
+      "example": "I have bread and coffee for breakfast.",
+      "accept": [
+        "i eat",
+        "i have"
+      ]
+    },
+    {
+      "q": "How do you go to work?",
+      "hint": "Beginne mit: I go to work by ...",
+      "example": "I go to work by car.",
+      "accept": [
+        "i go to work",
+        "i drive to work"
+      ]
+    },
+    {
+      "q": "What do you do after work?",
+      "hint": "Beginne mit: After work, I ...",
+      "example": "After work, I go home.",
+      "accept": [
+        "after work i",
+        "i go",
+        "i like"
+      ]
+    },
+    {
+      "q": "What do you do in the evening?",
+      "hint": "Beginne mit: In the evening, I ...",
+      "example": "In the evening, I watch TV.",
+      "accept": [
+        "in the evening i",
+        "i watch",
+        "i read",
+        "i learn"
+      ]
+    },
+    {
+      "q": "What do you drink during the day?",
+      "hint": "Beginne mit: I drink ...",
+      "example": "I drink water and coffee.",
+      "accept": [
+        "i drink"
+      ]
+    },
+    {
+      "q": "Do you cook at home?",
+      "hint": "Antworte mit: Yes, I do. / No, I do not.",
+      "example": "Yes, I cook at home.",
+      "accept": [
+        "yes i",
+        "no i",
+        "i cook"
+      ]
+    },
+    {
+      "q": "What do you do at the weekend?",
+      "hint": "Beginne mit: At the weekend, I ...",
+      "example": "At the weekend, I go hiking.",
+      "accept": [
+        "at the weekend i",
+        "on the weekend i",
+        "i go"
+      ]
+    },
+    {
+      "q": "When do you learn English?",
+      "hint": "Beginne mit: I learn English ...",
+      "example": "I learn English every day.",
+      "accept": [
+        "i learn english"
+      ]
+    },
+    {
+      "q": "What time do you go to bed?",
+      "hint": "Beginne mit: I go to bed at ...",
+      "example": "I go to bed at eleven o'clock.",
+      "accept": [
+        "i go to bed"
+      ]
+    }
+  ],
+  "Restaurant": [
+    {
+      "q": "Would you like something to drink?",
+      "hint": "Beginne mit: Yes, I would like ...",
+      "example": "Yes, I would like some water.",
+      "accept": [
+        "i would like",
+        "yes i would like",
+        "water please"
+      ]
+    },
+    {
+      "q": "What would you like to eat?",
+      "hint": "Beginne mit: I would like ...",
+      "example": "I would like chicken and rice.",
+      "accept": [
+        "i would like"
+      ]
+    },
+    {
+      "q": "Do you want a starter?",
+      "hint": "Antworte mit: Yes, please. / No, thank you.",
+      "example": "No, thank you.",
+      "accept": [
+        "yes please",
+        "no thank you"
+      ]
+    },
+    {
+      "q": "How is your food?",
+      "hint": "Beginne mit: It is ...",
+      "example": "It is very good.",
+      "accept": [
+        "it is",
+        "its"
+      ]
+    },
+    {
+      "q": "Would you like dessert?",
+      "hint": "Antworte mit: Yes, please. / No, thank you.",
+      "example": "Yes, please.",
+      "accept": [
+        "yes please",
+        "no thank you"
+      ]
+    },
+    {
+      "q": "Do you need anything else?",
+      "hint": "Beginne mit: Yes, I need ... / No, thank you.",
+      "example": "No, thank you.",
+      "accept": [
+        "yes i need",
+        "no thank you"
+      ]
+    },
+    {
+      "q": "Is everything okay?",
+      "hint": "Antworte mit: Yes, everything is fine.",
+      "example": "Yes, everything is fine.",
+      "accept": [
+        "yes everything",
+        "everything is",
+        "yes it is"
+      ]
+    },
+    {
+      "q": "Would you like coffee or tea?",
+      "hint": "Beginne mit: I would like ...",
+      "example": "I would like coffee, please.",
+      "accept": [
+        "i would like",
+        "coffee please",
+        "tea please"
+      ]
+    },
+    {
+      "q": "Are you ready to order?",
+      "hint": "Antworte mit: Yes, I am. / Not yet.",
+      "example": "Yes, I am ready.",
+      "accept": [
+        "yes i am",
+        "i am ready",
+        "not yet"
+      ]
+    },
+    {
+      "q": "Would you like the bill?",
+      "hint": "Antworte mit: Yes, please.",
+      "example": "Yes, please. The bill, please.",
+      "accept": [
+        "yes please",
+        "the bill please"
+      ]
+    }
+  ],
+  "Hotel & Reise": [
+    {
+      "q": "Do you have a reservation?",
+      "hint": "Beginne mit: Yes, I have a reservation ...",
+      "example": "Yes, I have a reservation.",
+      "accept": [
+        "yes i have",
+        "i have a reservation"
+      ]
+    },
+    {
+      "q": "What is your name, please?",
+      "hint": "Beginne mit: My name is ...",
+      "example": "My name is Mark.",
+      "accept": [
+        "my name is",
+        "i am"
+      ]
+    },
+    {
+      "q": "How many nights are you staying?",
+      "hint": "Beginne mit: I am staying for ... nights.",
+      "example": "I am staying for three nights.",
+      "accept": [
+        "i am staying",
+        "for three nights",
+        "for two nights"
+      ]
+    },
+    {
+      "q": "Would you like a single or double room?",
+      "hint": "Beginne mit: I would like ...",
+      "example": "I would like a double room.",
+      "accept": [
+        "i would like"
+      ]
+    },
+    {
+      "q": "Do you need Wi-Fi?",
+      "hint": "Antworte mit: Yes, please. / No, thank you.",
+      "example": "Yes, please.",
+      "accept": [
+        "yes please",
+        "no thank you",
+        "yes i do"
+      ]
+    },
+    {
+      "q": "What time would you like breakfast?",
+      "hint": "Beginne mit: At ... please.",
+      "example": "At eight o'clock, please.",
+      "accept": [
+        "at "
+      ]
+    },
+    {
+      "q": "Do you need a taxi?",
+      "hint": "Antworte mit: Yes, please. / No, thank you.",
+      "example": "No, thank you.",
+      "accept": [
+        "yes please",
+        "no thank you",
+        "yes i do",
+        "no i dont"
+      ]
+    },
+    {
+      "q": "Where are you travelling to?",
+      "hint": "Beginne mit: I am travelling to ...",
+      "example": "I am travelling to London.",
+      "accept": [
+        "i am travelling to",
+        "i am traveling to",
+        "i go to"
+      ]
+    },
+    {
+      "q": "When is your flight?",
+      "hint": "Beginne mit: My flight is ...",
+      "example": "My flight is tomorrow morning.",
+      "accept": [
+        "my flight is"
+      ]
+    },
+    {
+      "q": "Did you enjoy your stay?",
+      "hint": "Beginne mit: Yes, I did. / No, I did not.",
+      "example": "Yes, I did. It was very nice.",
+      "accept": [
+        "yes i did",
+        "no i did not",
+        "it was"
+      ]
+    }
+  ],
+  "Einkaufen": [
+    {
+      "q": "Can I help you?",
+      "hint": "Beginne mit: Yes, I am looking for ...",
+      "example": "Yes, I am looking for a jacket.",
+      "accept": [
+        "i am looking for",
+        "yes i"
+      ]
+    },
+    {
+      "q": "What are you looking for?",
+      "hint": "Beginne mit: I am looking for ...",
+      "example": "I am looking for a T-shirt.",
+      "accept": [
+        "i am looking for"
+      ]
+    },
+    {
+      "q": "What size do you need?",
+      "hint": "Beginne mit: I need size ...",
+      "example": "I need size medium.",
+      "accept": [
+        "i need size",
+        "size "
+      ]
+    },
+    {
+      "q": "What colour would you like?",
+      "hint": "Beginne mit: I would like ...",
+      "example": "I would like blue.",
+      "accept": [
+        "i would like"
+      ]
+    },
+    {
+      "q": "Would you like to try it on?",
+      "hint": "Antworte mit: Yes, please. / No, thank you.",
+      "example": "Yes, please.",
+      "accept": [
+        "yes please",
+        "no thank you"
+      ]
+    },
+    {
+      "q": "Does it fit?",
+      "hint": "Beginne mit: Yes, it fits. / No, it is too ...",
+      "example": "Yes, it fits well.",
+      "accept": [
+        "yes it fits",
+        "no it is",
+        "it is too"
+      ]
+    },
+    {
+      "q": "How much is it?",
+      "hint": "Du kannst fragen: How much is it?",
+      "example": "How much is it?",
+      "accept": [
+        "how much is it"
+      ]
+    },
+    {
+      "q": "Would you like anything else?",
+      "hint": "Beginne mit: Yes, I would like ... / No, thank you.",
+      "example": "No, thank you.",
+      "accept": [
+        "no thank you",
+        "i would like"
+      ]
+    },
+    {
+      "q": "How would you like to pay?",
+      "hint": "Beginne mit: By card, please. / Cash, please.",
+      "example": "By card, please.",
+      "accept": [
+        "by card",
+        "cash please",
+        "with card"
+      ]
+    },
+    {
+      "q": "Do you need a bag?",
+      "hint": "Antworte mit: Yes, please. / No, thank you.",
+      "example": "No, thank you.",
+      "accept": [
+        "yes please",
+        "no thank you"
+      ]
+    }
+  ],
+  "Weg fragen": [
+    {
+      "q": "Excuse me, can I help you?",
+      "hint": "Beginne mit: Yes, where is ...?",
+      "example": "Yes, where is the train station?",
+      "accept": [
+        "where is",
+        "how do i get"
+      ]
+    },
+    {
+      "q": "Where do you want to go?",
+      "hint": "Beginne mit: I want to go to ...",
+      "example": "I want to go to the train station.",
+      "accept": [
+        "i want to go",
+        "i would like to go"
+      ]
+    },
+    {
+      "q": "Are you going to the city centre?",
+      "hint": "Antworte mit: Yes, I am. / No, I am not.",
+      "example": "Yes, I am.",
+      "accept": [
+        "yes i am",
+        "no i am not"
+      ]
+    },
+    {
+      "q": "Do you want to walk or take the bus?",
+      "hint": "Beginne mit: I want to ...",
+      "example": "I want to walk.",
+      "accept": [
+        "i want to",
+        "i would like to"
+      ]
+    },
+    {
+      "q": "Do you know this street?",
+      "hint": "Antworte mit: Yes, I do. / No, I don't.",
+      "example": "No, I don't.",
+      "accept": [
+        "yes i do",
+        "no i do not",
+        "no i dont"
+      ]
+    },
+    {
+      "q": "Is the station far from here?",
+      "hint": "Beginne mit: Is the station ... / How far ...?",
+      "example": "How far is the station from here?",
+      "accept": [
+        "how far",
+        "is the station"
+      ]
+    },
+    {
+      "q": "Can you show me on the map?",
+      "hint": "Antworte mit: Yes, of course. / Sorry, I can't.",
+      "example": "Yes, of course.",
+      "accept": [
+        "yes of course",
+        "sorry i cannot",
+        "sorry i cant"
+      ]
+    },
+    {
+      "q": "Which way is the hotel?",
+      "hint": "Beginne mit: The hotel is ...",
+      "example": "The hotel is on the left.",
+      "accept": [
+        "the hotel is",
+        "it is on"
+      ]
+    },
+    {
+      "q": "Is there a bus stop nearby?",
+      "hint": "Antworte mit: Yes, there is. / No, there isn't.",
+      "example": "Yes, there is.",
+      "accept": [
+        "yes there is",
+        "no there is not"
+      ]
+    },
+    {
+      "q": "How long does it take?",
+      "hint": "Beginne mit: It takes about ... minutes.",
+      "example": "It takes about ten minutes.",
+      "accept": [
+        "it takes"
+      ]
+    }
+  ],
+  "Arbeit": [
+    {
+      "q": "What do you do for work?",
+      "hint": "Beginne mit: I work as ... / I work in ...",
+      "example": "I work in electronics.",
+      "accept": [
+        "i work as",
+        "i work in"
+      ]
+    },
+    {
+      "q": "Where do you work?",
+      "hint": "Beginne mit: I work in ... / I work at ...",
+      "example": "I work in Heilbronn.",
+      "accept": [
+        "i work in",
+        "i work at"
+      ]
+    },
+    {
+      "q": "What time do you start work?",
+      "hint": "Beginne mit: I start work at ...",
+      "example": "I start work at eight o'clock.",
+      "accept": [
+        "i start work"
+      ]
+    },
+    {
+      "q": "Do you work with computers?",
+      "hint": "Antworte mit: Yes, I do. / No, I don't.",
+      "example": "Yes, I work with computers.",
+      "accept": [
+        "yes i",
+        "no i",
+        "i work with"
+      ]
+    },
+    {
+      "q": "What do you like about your job?",
+      "hint": "Beginne mit: I like ...",
+      "example": "I like working with technology.",
+      "accept": [
+        "i like"
+      ]
+    },
+    {
+      "q": "Do you work alone or in a team?",
+      "hint": "Beginne mit: I work ...",
+      "example": "I work in a team.",
+      "accept": [
+        "i work"
+      ]
+    },
+    {
+      "q": "What are you learning now?",
+      "hint": "Beginne mit: I am learning ...",
+      "example": "I am learning English and IT.",
+      "accept": [
+        "i am learning",
+        "im learning"
+      ]
+    },
+    {
+      "q": "Why do you want a new job?",
+      "hint": "Beginne mit: I want a new job because ...",
+      "example": "I want a new job because I want to learn more.",
+      "accept": [
+        "i want a new job because",
+        "because i"
+      ]
+    },
+    {
+      "q": "What are you good at?",
+      "hint": "Beginne mit: I am good at ...",
+      "example": "I am good at technical work.",
+      "accept": [
+        "i am good at",
+        "im good at"
+      ]
+    },
+    {
+      "q": "What job would you like?",
+      "hint": "Beginne mit: I would like to work as ...",
+      "example": "I would like to work in IT support.",
+      "accept": [
+        "i would like to work",
+        "i want to work"
+      ]
+    }
+  ],
+  "Strand & Windsurfen": [
+    {
+      "q": "Do you like the beach?",
+      "hint": "Antworte mit: Yes, I do. / No, I don't.",
+      "example": "Yes, I love the beach.",
+      "accept": [
+        "yes i",
+        "no i",
+        "i love the beach",
+        "i like the beach"
+      ]
+    },
+    {
+      "q": "Do you like windsurfing?",
+      "hint": "Antworte mit: Yes, I do. / No, I don't.",
+      "example": "Yes, I love windsurfing.",
+      "accept": [
+        "yes i",
+        "no i",
+        "i love windsurfing",
+        "i like windsurfing"
+      ]
+    },
+    {
+      "q": "How often do you go windsurfing?",
+      "hint": "Beginne mit: I go windsurfing ...",
+      "example": "I go windsurfing at the weekend.",
+      "accept": [
+        "i go windsurfing"
+      ]
+    },
+    {
+      "q": "Where do you go windsurfing?",
+      "hint": "Beginne mit: I go windsurfing at ... / in ...",
+      "example": "I go windsurfing at the lake.",
+      "accept": [
+        "i go windsurfing"
+      ]
+    },
+    {
+      "q": "What size sail do you use?",
+      "hint": "Beginne mit: I use a ... square metre sail.",
+      "example": "I use a six square metre sail.",
+      "accept": [
+        "i use"
+      ]
+    },
+    {
+      "q": "Is there enough wind today?",
+      "hint": "Beginne mit: Yes, there is ... / No, there isn't ...",
+      "example": "Yes, there is enough wind today.",
+      "accept": [
+        "yes there is",
+        "no there is not",
+        "there is enough wind"
+      ]
+    },
+    {
+      "q": "Is the water cold?",
+      "hint": "Beginne mit: Yes, it is. / No, it isn't.",
+      "example": "Yes, the water is cold.",
+      "accept": [
+        "yes it is",
+        "no it is not",
+        "the water is"
+      ]
+    },
+    {
+      "q": "Do you need a wetsuit?",
+      "hint": "Antworte mit: Yes, I do. / No, I don't.",
+      "example": "Yes, I need a wetsuit.",
+      "accept": [
+        "yes i",
+        "no i",
+        "i need a wetsuit"
+      ]
+    },
+    {
+      "q": "What do you want to practise today?",
+      "hint": "Beginne mit: I want to practise ...",
+      "example": "I want to practise the beach start.",
+      "accept": [
+        "i want to practise",
+        "i want to practice"
+      ]
+    },
+    {
+      "q": "Was it a good day on the water?",
+      "hint": "Beginne mit: Yes, it was ... / No, it wasn't ...",
+      "example": "Yes, it was a very good day.",
+      "accept": [
+        "yes it was",
+        "no it was not",
+        "it was"
+      ]
+    }
+  ]
+};
+
 function openDB(){return new Promise((res,rej)=>{
 // No explicit version: existing databases from newer app versions stay accessible.
 const r=indexedDB.open(DB_NAME);
@@ -2674,7 +3446,7 @@ function weight(e){let w=1+(e.falsch||0)*3;if((e.richtig||0)+(e.falsch||0)===0)w
 function choose(arr,last){if(!arr.length)return null;let x=arr.filter(e=>arr.length===1||e.id!==last);if(!x.length)x=arr;const ws=x.map(weight),sum=ws.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<x.length;i++){r-=ws[i];if(r<=0)return x[i]}return x.at(-1)}
 function show(id,text,kind){const el=document.getElementById(id);el.textContent=text;el.className=`result ${kind}`}
 function clearR(id){const el=document.getElementById(id);el.textContent="";el.className="result"}
-function speak(t){if(!t)return;if(!("speechSynthesis"in window)){alert("Vorlesen wird nicht unterstützt.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-GB";u.rate=.88;speechSynthesis.speak(u)}
+function speak(t,rate=.88){if(!t)return;if(!("speechSynthesis"in window)){alert("Vorlesen wird nicht unterstützt.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-GB";u.rate=rate;speechSynthesis.speak(u)}
 async function right(e,undo=false){e.richtig=(e.richtig||0)+1;if(undo&&(e.falsch||0)>0)e.falsch--;e.serie=(e.serie||0)+1;let d=1;if(e.serie===2)d=2;else if(e.serie===3)d=4;else if(e.serie===4)d=7;else if(e.serie===5)d=14;else if(e.serie>=6)d=30;e.naechsteWiederholung=plusDays(d);e.letzteWiederholung=today();await put(e)}
 async function wrong(e){e.falsch=(e.falsch||0)+1;e.serie=0;e.naechsteWiederholung=today();e.letzteWiederholung=today();await put(e)}
 
@@ -2683,6 +3455,65 @@ async function nextMist(){const a=await all(),d=a.filter(hard);document.getEleme
 async function nextSent(){const a=await all(),d=a.filter(hasSentence);document.getElementById("sentCount").textContent=`${d.length} Sätze vorhanden`;if(!d.length){sentCur=null;document.getElementById("sentQ").textContent="Noch kein Beispielsatz gespeichert.";return}sentCur=choose(d,sentLast);sentLast=sentCur.id;sentWrong=false;document.getElementById("sentQ").textContent=pair(sentCur).de;document.getElementById("sentA").value="";document.getElementById("sentManual").classList.add("hidden");clearR("sentR")}
 async function check(kind){let c,aId,rId,mId,exp;if(kind==="today"){c=todayCur;aId="todayA";rId="todayR";mId="todayManual";exp=c?.englisch}if(kind==="mist"){c=mistCur;aId="mistA";rId="mistR";mId="mistManual";exp=c?.englisch}if(kind==="sent"){c=sentCur;aId="sentA";rId="sentR";mId="sentManual";exp=c?pair(c).en:null}if(!c)return;const ans=document.getElementById(aId).value.trim();if(!ans){show(rId,"Bitte zuerst antworten.","warn");return}const b=best(ans,exp);if(b.score>=.9){await right(c);show(rId,"✅ RICHTIG","good");document.getElementById(mId).classList.add("hidden")}else{await wrong(c);show(rId,b.score>=.72?`🟡 FAST RICHTIG\nRichtig: ${b.text}`:`❌ NOCH NICHT RICHTIG\nRichtig: ${b.text}`,b.score>=.72?"warn":"bad");document.getElementById(mId).classList.remove("hidden");if(kind==="today")todayWrong=true;if(kind==="mist")mistWrong=true;if(kind==="sent")sentWrong=true}await refresh()}
 async function manual(kind){let c,w,r,m;if(kind==="today"){c=todayCur;w=todayWrong;r="todayR";m="todayManual";todayWrong=false}if(kind==="mist"){c=mistCur;w=mistWrong;r="mistR";m="mistManual";mistWrong=false}if(kind==="sent"){c=sentCur;w=sentWrong;r="sentR";m="sentManual";sentWrong=false}if(!c)return;await right(c,w);show(r,"✅ ALS RICHTIG MARKIERT","good");document.getElementById(m).classList.add("hidden");await refresh()}
+
+let coachIndex=0,coachRight=0,coachWrong=0,coachTopicName="";
+function coachNormalize(s){return norm(s).replace(/\bim\b/g,"i am").replace(/\bcant\b/g,"cannot").replace(/\bdont\b/g,"do not")}
+function coachQuestions(){return CONVERSATIONS[coachTopicName]||[]}
+function coachCurrent(){const qs=coachQuestions();return qs.length?qs[Math.min(coachIndex,qs.length-1)]:null}
+function coachRender(){
+  const q=coachCurrent();
+  if(!q)return;
+  document.getElementById("coachQ").textContent=q.q;
+  document.getElementById("coachCount").textContent=`Frage ${coachIndex+1} von ${coachQuestions().length}`;
+  document.getElementById("coachScore").textContent=`${coachRight} richtig · ${coachWrong} üben`;
+  document.getElementById("coachA").value="";
+  document.getElementById("coachHint").classList.remove("show");
+  document.getElementById("coachHint").textContent="";
+  clearR("coachR");
+}
+function coachStart(name){
+  coachTopicName=name||Object.keys(CONVERSATIONS)[0];
+  coachIndex=0;coachRight=0;coachWrong=0;coachRender();
+}
+function coachShowHelp(){
+  const q=coachCurrent();if(!q)return;
+  const h=document.getElementById("coachHint");
+  h.textContent=`${q.hint}  Beispiel: ${q.example}`;
+  h.classList.add("show");
+}
+function coachCheck(){
+  const q=coachCurrent();if(!q)return;
+  const raw=document.getElementById("coachA").value.trim();
+  if(!raw){show("coachR","Bitte antworte zuerst mit einem englischen Satz.","warn");return}
+  const a=coachNormalize(raw);
+  const words=a.split(/\s+/).filter(Boolean);
+  const hits=(q.accept||[]).filter(x=>a.includes(coachNormalize(x)));
+  if(hits.length){
+    coachRight++;
+    show("coachR",`✅ GUT!\nDein Satz: ${raw}`,"good");
+  }else if(words.length>=4){
+    coachRight++;
+    show("coachR",`🟡 DAS KANN SO FUNKTIONIEREN\nDein Satz: ${raw}\nBeispiel: ${q.example}`,"warn");
+  }else{
+    coachWrong++;
+    show("coachR",`🔁 VERSUCHE EINEN GANZEN SATZ\nBeispiel: ${q.example}`,"bad");
+  }
+  document.getElementById("coachScore").textContent=`${coachRight} richtig · ${coachWrong} üben`;
+}
+function coachNext(){
+  const qs=coachQuestions();if(!qs.length)return;
+  coachIndex=(coachIndex+1)%qs.length;
+  coachRender();
+}
+function setupCoach(){
+  const sel=document.getElementById("coachTopic");
+  sel.innerHTML="";
+  for(const name of Object.keys(CONVERSATIONS)){
+    const o=document.createElement("option");o.value=name;o.textContent=name;sel.appendChild(o);
+  }
+  coachTopicName=sel.value||Object.keys(CONVERSATIONS)[0];
+  coachStart(coachTopicName);
+}
 
 function cleanGermanKey(t){
   return String(t||"").toLowerCase().trim().replace(/[.!?,;:]/g,"").replace(/\s+/g," ");
@@ -2751,7 +3582,7 @@ async function stats(){const a=await all();document.getElementById("sTotal").tex
 async function refresh(){await renderList();await stats();const a=await all();document.getElementById("todayCount").textContent=`${a.filter(due).length} Aufgaben fällig`;document.getElementById("mistCount").textContent=a.filter(hard).length?`${a.filter(hard).length} schwierige Einträge`:"Keine schwierigen Wörter";document.getElementById("sentCount").textContent=`${a.filter(hasSentence).length} Sätze vorhanden`}
 async function exportData(){const data={app:"Mein Englisch-Trainer",version:2,entries:await all()},blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`englisch-backup-${today()}.json`;a.click();URL.revokeObjectURL(url)}
 async function importData(file){try{const d=JSON.parse(await file.text());if(!Array.isArray(d.entries)||!d.entries.every(e=>e&&typeof e.deutsch==="string"&&e.deutsch.trim()&&typeof e.englisch==="string"&&e.englisch.trim()))throw Error("Ungültige Datei");if(!confirm("Bestehende Daten ersetzen?"))return;await replaceEntries(d.entries);await refresh();await nextToday();alert("Sicherung importiert.")}catch(e){alert("Import fehlgeschlagen.")}}
-function tab(id){document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));if(id==="today")nextToday();if(id==="mistakes")nextMist();if(id==="sentences")nextSent();if(id==="add")renderList();if(id==="progress")stats()}
+function tab(id){document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));if(id==="today")nextToday();if(id==="mistakes")nextMist();if(id==="sentences")nextSent();if(id==="conversation")coachRender();if(id==="add")renderList();if(id==="progress")stats()}
 
 document.addEventListener("DOMContentLoaded",async()=>{
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
@@ -2772,6 +3603,13 @@ document.getElementById("sentNext").onclick=nextSent;
 document.getElementById("sentListen").onclick=()=>sentCur&&speak(vars(pair(sentCur).en)[0]);
 document.getElementById("sentCheck").onclick=()=>check("sent");
 document.getElementById("sentManual").onclick=()=>manual("sent");
+setupCoach();
+document.getElementById("coachTopic").onchange=e=>coachStart(e.target.value);
+document.getElementById("coachListen").onclick=()=>{const q=coachCurrent();if(q)speak(q.q)};
+document.getElementById("coachSlow").onclick=()=>{const q=coachCurrent();if(q)speak(q.q,.62)};
+document.getElementById("coachHelp").onclick=coachShowHelp;
+document.getElementById("coachCheck").onclick=coachCheck;
+document.getElementById("coachNext").onclick=coachNext;
 document.getElementById("export").onclick=exportData;
 document.getElementById("import").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=e=>e.target.files?.[0]&&importData(e.target.files[0]);
@@ -2783,6 +3621,6 @@ for(const event of ["onclick","oninput","onchange"]){const handler=el[event];if(
 }
 // Tabs themselves remain usable even when storage cannot be opened.
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===b.dataset.tab));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));ready.then(()=>tab(b.dataset.tab)).catch(reportError)});
-try{await ready;await nextToday();await refresh();status("Version 2.3 · Lerninhalte geladen")}catch(error){reportError(error);document.getElementById("todayQ").textContent="Bitte den Hinweis oben beachten."}
+try{await ready;await nextToday();await refresh();status("Version 2.4 · Lerninhalte geladen")}catch(error){reportError(error);document.getElementById("todayQ").textContent="Bitte den Hinweis oben beachten."}
 });
 </script></body></html>
